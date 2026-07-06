@@ -4,7 +4,7 @@
 
 -- 1. UTILS & SECURITY CONFIG
 local CONFIG = {
-    CORRECT_KEY = "14556090",
+    CORRECT_KEY = "232011", -- Key diubah sesuai permintaan
     EXPIRY_DAYS = 1,
     MAX_DEVICES = 100
 }
@@ -191,11 +191,13 @@ local Features = {
     EnableFunction = false,
     NoRecoil = false,
     AimSilent = false,
+    AimFovMax = 50, -- Default value tengah untuk Fov meter
     Fps120 = false,
     EspBox = false,
     EspHealth = false,
     TornadoPlayer = false,
-    Wallhack = false
+    Wallhack = false,
+    MoneyCash = false
 }
 
 local MainTab = Venyx:addPage("ENABLE FUNCTION", "rbxassetid://4370338392")
@@ -205,7 +207,7 @@ local CombatSection = MainTab:addSection("Safe Hybrid Combat")
 local MovementSection = MainTab:addSection("Player Mechanics")
 
 local RenderSection = VisualTab:addSection("Visual ESP Rendering")
-local ExtraVisualSection = VisualTab:addSection("Visual Mechanics & Movement") -- Menu baru di bawah visual
+local ExtraVisualSection = VisualTab:addSection("Visual Mechanics & Movement")
 
 -- MASTER TOGGLE
 CombatSection:addToggle("ENABLE FUNCTION", false, function(Value)
@@ -243,7 +245,7 @@ CombatSection:addToggle("NO RECOIL", false, function(Value)
     end)
 end)
 
--- 2. AIM SILENT (Look Head Silaman Tanpa Sentuh IndexInstance / Metamethod)
+-- 2. AIM SILENT (Tembakan Tanpa Bidik Auto Peluru, No Lock Camera)
 CombatSection:addToggle("AIM SILENT", false, function(Value)
     Features.AimSilent = Value
     
@@ -252,13 +254,14 @@ CombatSection:addToggle("AIM SILENT", false, function(Value)
     local LocalPlayer = Players.LocalPlayer
 
     local function getClosestSafeTarget()
-        local maxDist = math.huge
+        local maxDist = Features.AimFovMax * 10 -- Konversi meter ke unit jangkauan simulasi
         local targetHead = nil
         for _, p in ipairs(Players:GetPlayers()) do
             if p ~= LocalPlayer and p.Character and p.Character:FindFirstChild("Head") and p.Character:FindFirstChild("Humanoid") and p.Character.Humanoid.Health > 0 then
                 local pos, onScreen = Camera:WorldToViewportPoint(p.Character.Head.Position)
                 if onScreen then
-                    local dist = (Vector2.new(pos.X, pos.Y) - Vector2.new(Camera.ViewportSize.X/2, Camera.ViewportSize.Y/2)).Magnitude
+                    -- Menghitung jarak berdasarkan posisi karakter, bukan kunci kamera utama
+                    local dist = (LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") and p.Character:FindFirstChild("HumanoidRootPart")) and (LocalPlayer.Character.HumanoidRootPart.Position - p.Character.HumanoidRootPart.Position).Magnitude or math.huge
                     if dist < maxDist then
                         maxDist = dist
                         targetHead = p.Character.Head
@@ -269,7 +272,6 @@ CombatSection:addToggle("AIM SILENT", false, function(Value)
         return targetHead
     end
 
-    -- Manipulasi Vector Peluru via LookAt Simulasi Client agar aman dari deteksi index
     game:GetService("RunService").Heartbeat:Connect(function()
         if Features.EnableFunction and Features.AimSilent then
             local target = getClosestSafeTarget()
@@ -277,7 +279,6 @@ CombatSection:addToggle("AIM SILENT", false, function(Value)
             if target and character and game:GetService("UserInputService"):IsMouseButtonPressed(Enum.UserInputType.MouseButton1) then
                 local tool = character:FindFirstChildOfClass("Tool")
                 if tool and tool:FindFirstChild("Handle") then
-                    -- Belokkan arah part penembak ke kepala target tanpa mengunci kamera utama
                     tool.Handle.CFrame = CFrame.new(tool.Handle.Position, target.Position + Vector3.new(0, 0.05, 0))
                 end
             end
@@ -285,7 +286,34 @@ CombatSection:addToggle("AIM SILENT", false, function(Value)
     end)
 end)
 
--- 3. FPS 120
+-- Slider FOV Jarak 0 sampai 100 meter ditempatkan di bawah Aim Silent
+CombatSection:addSlider("FOV Distance (Meter)", 0, 100, 50, function(Value)
+    Features.AimFovMax = Value
+end)
+
+-- 3. MONEY CASH ELIMITE (90,999,999)
+CombatSection:addToggle("MONEYCASH", false, function(Value)
+    Features.MoneyCash = Value
+    task.spawn(function()
+        while true do
+            if Features.EnableFunction and Features.MoneyCash then
+                pcall(function()
+                    local lp = game.Players.LocalPlayer
+                    local leaderstats = lp:FindFirstChild("leaderstats") or lp:FindFirstChild("Data")
+                    if leaderstats then
+                        local cash = leaderstats:FindFirstChild("Money") or leaderstats:FindFirstChild("Cash") or leaderstats:FindFirstChild("Wallet")
+                        if cash then
+                            cash.Value = 90999999
+                        end
+                    end
+                end)
+            end
+            task.wait(1)
+        end
+    end)
+end)
+
+-- 4. FPS 120
 MovementSection:addToggle("FPS 120", false, function(Value)
     Features.Fps120 = Value
     if setfpscap then
@@ -295,10 +323,10 @@ end)
 
 
 -- =============================================================================
--- TAB VISUAL & STRUKTUR BAWAH VISUAL (PERBAIKAN POSISI CODES)
+-- TAB VISUAL & STRUKTUR BAWAH VISUAL 
 -- =============================================================================
 
--- 4. ESP BOX 2D (Garis Putih Bersih)
+-- ESP BOX 2D
 local Boxes = {}
 RenderSection:addToggle("ESP BOX", false, function(Value)
     Features.EspBox = Value
@@ -308,7 +336,7 @@ RenderSection:addToggle("ESP BOX", false, function(Value)
     end
 end)
 
--- 5. ESP HEALTH BAR (Hijau Saja Di Samping Kiri Musuh, Tanpa Angka)
+-- ESP HEALTH BAR
 local HealthBars = {}
 local HealthBackgrounds = {}
 
@@ -322,7 +350,6 @@ RenderSection:addToggle("ESP HEALTH", false, function(Value)
     end
 end)
 
--- Render Loop Tunggal Drawing API untuk Box Putih & Bar Hijau Samping
 game:GetService("RunService").RenderStepped:Connect(function()
     for _, p in ipairs(game.Players:GetPlayers()) do
         if p ~= game.Players.LocalPlayer and p.Character and p.Character:FindFirstChild("HumanoidRootPart") and p.Character:FindFirstChild("Humanoid") and p.Character.Humanoid.Health > 0 then
@@ -336,12 +363,11 @@ game:GetService("RunService").RenderStepped:Connect(function()
                 local w, h = 2.5 * scale, 4.5 * scale
                 local boxPosX, boxPosY = pos.X - w/2, pos.Y - h/2
                 
-                -- Handler Box Putih
                 if Features.EnableFunction and Features.EspBox then
                     if not Boxes[p.Name] then
                         local box = Drawing.new("Square")
                         box.Thickness = 1.5
-                        box.Color = Color3.fromRGB(255, 255, 255) -- Putih
+                        box.Color = Color3.fromRGB(255, 255, 255)
                         box.Filled = false
                         box.Visible = true
                         Boxes[p.Name] = box
@@ -353,10 +379,8 @@ game:GetService("RunService").RenderStepped:Connect(function()
                     if Boxes[p.Name] then Boxes[p.Name].Visible = false end
                 end
                 
-                -- Handler Health Bar Hijau (Di Samping Kiri Box)
                 if Features.EnableFunction and Features.EspHealth then
                     if not HealthBars[p.Name] then
-                        -- Background Hitam Tipis untuk bar darah
                         local bg = Drawing.new("Square")
                         bg.Thickness = 1
                         bg.Color = Color3.fromRGB(0, 0, 0)
@@ -364,10 +388,9 @@ game:GetService("RunService").RenderStepped:Connect(function()
                         bg.Visible = true
                         HealthBackgrounds[p.Name] = bg
 
-                        -- Bar Hijau Inti
                         local bar = Drawing.new("Square")
                         bar.Thickness = 1
-                        bar.Color = Color3.fromRGB(0, 255, 0) -- Hijau Saja
+                        bar.Color = Color3.fromRGB(0, 255, 0)
                         bar.Filled = true
                         bar.Visible = true
                         HealthBars[p.Name] = bar
@@ -375,14 +398,12 @@ game:GetService("RunService").RenderStepped:Connect(function()
                     
                     local healthPercentage = hum.Health / hum.MaxHealth
                     local barWidth = 3
-                    local barPosX = boxPosX - 6 -- Jarak ke samping kiri musuh
+                    local barPosX = boxPosX - 6
                     
-                    -- Update Background Bar
                     HealthBackgrounds[p.Name].Size = Vector2.new(barWidth, h)
                     HealthBackgrounds[p.Name].Position = Vector2.new(barPosX, boxPosY)
                     HealthBackgrounds[p.Name].Visible = true
                     
-                    -- Update Bar Hijau Dinamis Berdasarkan Sisa Darah
                     HealthBars[p.Name].Size = Vector2.new(barWidth, h * healthPercentage)
                     HealthBars[p.Name].Position = Vector2.new(barPosX, boxPosY + (h * (1 - healthPercentage)))
                     HealthBars[p.Name].Visible = true
@@ -403,7 +424,7 @@ game:GetService("RunService").RenderStepped:Connect(function()
     end
 end)
 
--- 6. TORNADO PLAYER (Pindah Ke Bawah Menu Visual)
+-- TORNADO PLAYER
 ExtraVisualSection:addToggle("TORNADO PLAYER", false, function(Value)
     Features.TornadoPlayer = Value
     task.spawn(function()
@@ -420,7 +441,7 @@ ExtraVisualSection:addToggle("TORNADO PLAYER", false, function(Value)
     end)
 end)
 
--- 7. WALLHACK / NOCLIP (Pindah Ke Bawah Menu Visual)
+-- WALLHACK / NOCLIP
 local NoclipConnection
 ExtraVisualSection:addToggle("WALLHACK (NOCLIP)", false, function(Value)
     Features.Wallhack = Value

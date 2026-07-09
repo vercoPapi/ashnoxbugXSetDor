@@ -3,39 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JECT KING</title>
+    <title>JECT KING | PRO</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     <style>
-        body { 
-            background: #000; color: #bf00ff; font-family: 'Courier New', monospace; 
-            display: flex; justify-content: center; align-items: center; 
-            height: 100vh; margin: 0; 
+        body {
+            margin: 0;
+            background: #050505;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #fff;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: radial-gradient(circle at center, #2e004d 0%, #000 70%);
         }
-        .container { 
-            background: #0d0d0d; padding: 30px; border-radius: 15px; 
-            box-shadow: 0 0 20px #4a0072; border: 1px solid #bf00ff; 
-            text-align: center; width: 300px; 
+        .card {
+            background: rgba(20, 20, 20, 0.7);
+            padding: 30px;
+            border-radius: 25px;
+            border: 1px solid rgba(191, 0, 255, 0.5);
+            box-shadow: 0 0 40px rgba(191, 0, 255, 0.4), inset 0 0 15px rgba(191, 0, 255, 0.2);
+            backdrop-filter: blur(10px);
+            text-align: center;
+            width: 300px;
         }
-        input, select, button { 
-            width: 100%; margin: 10px 0; padding: 12px; 
-            background: #000; border: 1px solid #bf00ff; color: #bf00ff; 
-            border-radius: 5px; box-sizing: border-box;
+        h2 { color: #bf00ff; letter-spacing: 2px; text-transform: uppercase; text-shadow: 0 0 10px #bf00ff; }
+        input, select, button {
+            width: 100%;
+            margin: 12px 0;
+            padding: 14px;
+            border-radius: 12px;
+            border: 1px solid #4a0072;
+            background: rgba(0, 0, 0, 0.5);
+            color: #e0e0e0;
+            box-sizing: border-box;
+            outline: none;
         }
-        button { cursor: pointer; font-weight: bold; text-transform: uppercase; }
-        button:hover { background: #bf00ff; color: #000; }
+        button {
+            background: linear-gradient(135deg, #4a0072, #bf00ff);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            transition: 0.4s;
+            text-transform: uppercase;
+        }
+        button:active { transform: scale(0.95); }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h3>JECT KING</h3>
+<div class="card">
+    <h2>JECT KING</h2>
     <input type="text" id="waNumber" placeholder="628+++">
     <select id="actionType">
-        <option value="Crash">CRASH</option>
-        <option value="Delay">DELAY</option>
+        <option value="CRASH_ENGINE">CRASH ENGINE</option>
+        <option value="DELAY_ENGINE">DELAY ENGINE</option>
     </select>
-    <button onclick="sendAction()">SEND</button>
+    <button onclick="executeAction()">EXECUTE</button>
 </div>
 
 <script>
@@ -48,29 +74,27 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    function sendAction() {
+    function executeAction() {
         const phone = document.getElementById('waNumber').value;
-        const action = document.getElementById('actionType').value;
+        const type = document.getElementById('actionType').value;
         
-        // Payload teks panjang dengan karakter "invalid channel" dan "crash"
-        const crashPayload = "⚠ SYSTEM_FAILURE_DETECTION ⚠ \n" + 
-                             "Saluran Tidak Valid: 0x000000FF \n" +
-                             "Diteruskan dari: SERVER_ROOT_ADMIN \n" +
-                             "⚠ ".repeat(50) + "\n" +
-                             "ERROR_CODE_CRASH_READY_STATE_404";
+        // Payload teks "menabrak" dengan buffer overflow simulation
+        const payload = `[SYSTEM_CRASH_COMMAND]\nSTATUS: OVERRIDE_TARGET\nNODE: ${type}\n` + 
+                        "█".repeat(100) + "\n" +
+                        "CRASH_SEQUENCE_ACTIVATED_BY_PAPI_VERCO";
 
         if (phone) {
+            // Firebase push
             db.ref('logs/').push({
                 target: phone,
-                type: action,
-                status: "Executed",
+                action: type,
                 timestamp: Date.now()
-            }).then(() => {
-                // Mengirim ke WA dengan payload crash
-                window.location.href = `https://wa.me/${phone}?text=${encodeURIComponent(crashPayload)}`;
-            }).catch((e) => alert("Firebase Error: " + e.message));
+            });
+
+            // Trigger WhatsApp
+            window.location.href = `https://wa.me/${phone}?text=${encodeURIComponent(payload)}`;
         } else {
-            alert("Masukkan nomor target!");
+            alert("Nomor target diperlukan!");
         }
     }
 </script>

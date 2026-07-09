@@ -1,75 +1,96 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
-<meta charset="UTF-8">
-<title>TMY Logo</title>
-<style>
-body{
-    margin:0;
-    background:#111;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    height:100vh;
-}
-canvas{
-    background:transparent;
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JECT KING</title>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    <style>
+        body {
+            background-color: #0d0d0d;
+            color: #d1d1d1;
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: radial-gradient(circle, #2d004d 0%, #0d0d0d 80%);
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(128, 0, 255, 0.6);
+            border: 2px solid #bf00ff;
+            text-align: center;
+            width: 300px;
+        }
+        h2 { color: #bf00ff; text-shadow: 0 0 15px #bf00ff; margin-bottom: 20px; }
+        input, select, button {
+            width: 100%;
+            margin: 10px 0;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid #4a0072;
+            background: #1a1a1a;
+            color: white;
+            box-sizing: border-box;
+        }
+        button {
+            background: linear-gradient(45deg, #4a0072, #bf00ff);
+            cursor: pointer;
+            font-weight: bold;
+            text-transform: uppercase;
+            transition: 0.3s;
+        }
+        button:hover { background: #bf00ff; }
+    </style>
 </head>
 <body>
 
-<canvas id="canvas" width="300" height="300"></canvas>
+<div class="container">
+    <h2>JECT KING</h2>
+    <input type="text" id="waNumber" placeholder="628+++">
+    <select id="actionType">
+        <option value="Crash">Crash</option>
+        <option value="Delay">Delay</option>
+    </select>
+    <button onclick="sendAction()">Send</button>
+</div>
 
 <script>
-const canvas = document.getElementById('canvas');
-const ctx = canvas.getContext('2d');
+    // Konfigurasi Firebase Anda
+    const firebaseConfig = {
+        apiKey: "AIzaSyD2-buF7sMfF2kR3A-uGNEj34TZ6lDl8NU",
+        databaseURL: "https://myauthsystem-55ca0-default-rtdb.firebaseio.com",
+        projectId: "myauthsystem-55ca0",
+        storageBucket: "myauthsystem-55ca0.firebasestorage.app"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
 
-const cx = 150;
-const cy = 150;
-const r = 80;
+    function sendAction() {
+        const phone = document.getElementById('waNumber').value;
+        const action = document.getElementById('actionType').value;
 
-// Efek bulat 3D ungu
-const grad = ctx.createRadialGradient(
-    cx - 25, cy - 25, 10,
-    cx, cy, r
-);
+        if (phone) {
+            // Mengirim data ke Firebase path 'logs'
+            db.ref('logs/').push({
+                target: phone,
+                type: action,
+                message: "Mesin online " + action + " terhubung dengan firebase",
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+            });
 
-grad.addColorStop(0, "#e0b3ff");
-grad.addColorStop(0.4, "#b84dff");
-grad.addColorStop(0.75, "#7a00cc");
-grad.addColorStop(1, "#2b003d");
-
-// Lingkaran utama
-ctx.beginPath();
-ctx.arc(cx, cy, r, 0, Math.PI * 2);
-ctx.fillStyle = grad;
-ctx.fill();
-
-// Glow ungu
-ctx.shadowColor = "#b84dff";
-ctx.shadowBlur = 25;
-ctx.beginPath();
-ctx.arc(cx, cy, r, 0, Math.PI * 2);
-ctx.strokeStyle = "#d580ff";
-ctx.lineWidth = 4;
-ctx.stroke();
-
-// Reset shadow
-ctx.shadowBlur = 0;
-
-// Highlight 3D
-ctx.beginPath();
-ctx.arc(cx - 20, cy - 20, 22, 0, Math.PI * 2);
-ctx.fillStyle = "rgba(255,255,255,0.25)";
-ctx.fill();
-
-// Tulisan TMY
-ctx.font = "bold 28px Arial";
-ctx.textAlign = "center";
-ctx.textBaseline = "middle";
-ctx.fillStyle = "#ffffff";
-ctx.fillText("TMY", cx, cy);
+            // Redirect ke WhatsApp
+            window.location.href = "https://wa.me/" + phone;
+        } else {
+            alert("Masukkan nomor terlebih dahulu!");
+        }
+    }
 </script>
 
 </body>

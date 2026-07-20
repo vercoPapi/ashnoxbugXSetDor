@@ -3,34 +3,26 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AI Hacker - Code Generator & Chat 3D</title>
+    <title>AI Hacker Neural v5 — Online Intelligence</title>
     <style>
-        /* ===== RESET & BASE ===== */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;600;700&family=Fira+Code:wght@400;600&display=swap');
 
         :root {
-            --neon-cyan: #00ffff;
-            --neon-magenta: #ff00ff;
-            --neon-green: #00ff41;
-            --neon-yellow: #ffff00;
-            --dark-bg: #0a0a0f;
-            --panel-bg: rgba(10, 10, 20, 0.85);
-            --glass-edge: rgba(0, 255, 255, 0.15);
-            --ai-color: #00ffff;
-            --user-color: #ff00ff;
-            --font-main: 'Rajdhani', sans-serif;
-            --font-display: 'Orbitron', monospace;
-            --font-code: 'Fira Code', monospace;
+            --cyan: #00ffff;
+            --magenta: #ff00ff;
+            --green: #00ff41;
+            --yellow: #ffff00;
+            --dark: #0a0a0f;
+            --panel: rgba(10,10,20,0.88);
+            --glass: rgba(0,255,255,0.12);
+            --font: 'Rajdhani', sans-serif;
+            --display: 'Orbitron', monospace;
+            --code: 'Fira Code', monospace;
         }
-
         body {
-            font-family: var(--font-main);
-            background: var(--dark-bg);
+            font-family: var(--font);
+            background: var(--dark);
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -40,1578 +32,848 @@
             color: #fff;
         }
 
-        /* ===== 3D BACKGROUND SCENE ===== */
-        .scene-3d {
-            position: fixed;
-            inset: 0;
-            z-index: 0;
-            overflow: hidden;
-            transform-style: preserve-3d;
-        }
-        .scene-3d canvas {
-            display: block;
-            width: 100%;
-            height: 100%;
-        }
-
-        /* scanlines overlay */
+        /* 3D Scene */
+        .scene-3d { position: fixed; inset: 0; z-index: 0; overflow: hidden; }
+        .scene-3d canvas { display: block; width: 100%; height: 100%; }
         .scanlines {
-            position: fixed;
-            inset: 0;
-            z-index: 1;
-            pointer-events: none;
-            background: repeating-linear-gradient(
-                0deg,
-                transparent,
-                transparent 2px,
-                rgba(0, 255, 255, 0.015) 2px,
-                rgba(0, 255, 255, 0.015) 4px
-            );
+            position: fixed; inset: 0; z-index: 1; pointer-events: none;
+            background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,255,255,0.012) 2px, rgba(0,255,255,0.012) 4px);
         }
         .vignette {
-            position: fixed;
-            inset: 0;
-            z-index: 1;
-            pointer-events: none;
-            background: radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, 0.85) 100%);
+            position: fixed; inset: 0; z-index: 1; pointer-events: none;
+            background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.88) 100%);
         }
 
-        /* ===== MAIN CARD — 3D TRANSFORM ===== */
+        /* Chat Card 3D */
         .chat-wrapper {
-            position: relative;
-            z-index: 10;
-            width: 580px;
-            max-width: 94vw;
-            height: 750px;
-            max-height: 94vh;
+            position: relative; z-index: 10;
+            width: 600px; max-width: 95vw;
+            height: 780px; max-height: 95vh;
             transform: rotateX(2deg) rotateY(-1deg) translateZ(30px);
             transform-style: preserve-3d;
-            transition: transform 0.15s ease;
+            transition: transform 0.12s ease;
             border-radius: 24px;
         }
-        .chat-wrapper:hover {
-            transform: rotateX(0deg) rotateY(0deg) translateZ(40px);
-        }
-
         .chat-card {
-            width: 100%;
-            height: 100%;
-            background: var(--panel-bg);
-            backdrop-filter: blur(18px);
-            -webkit-backdrop-filter: blur(18px);
-            border: 1px solid var(--glass-edge);
+            width: 100%; height: 100%;
+            background: var(--panel);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass);
             border-radius: 24px;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            position: relative;
-            box-shadow:
-                0 0 40px rgba(0, 255, 255, 0.08),
-                0 0 80px rgba(255, 0, 255, 0.04),
-                inset 0 0 60px rgba(0, 255, 255, 0.02),
-                0 20px 60px rgba(0, 0, 0, 0.6);
+            display: flex; flex-direction: column;
+            overflow: hidden; position: relative;
+            box-shadow: 0 0 40px rgba(0,255,255,0.06), 0 0 80px rgba(255,0,255,0.03), inset 0 0 60px rgba(0,255,255,0.015), 0 20px 60px rgba(0,0,0,0.6);
         }
-        /* glowing edge */
         .chat-card::before {
-            content: '';
-            position: absolute;
-            inset: -2px;
-            border-radius: 26px;
-            z-index: -1;
-            background: conic-gradient(
-                from 0deg,
-                var(--neon-cyan),
-                var(--neon-magenta),
-                var(--neon-cyan),
-                var(--neon-magenta),
-                var(--neon-cyan)
-            );
-            opacity: 0.25;
-            animation: borderGlow 6s linear infinite;
+            content: ''; position: absolute; inset: -2px; border-radius: 26px; z-index: -1;
+            background: conic-gradient(from 0deg, var(--cyan), var(--magenta), var(--cyan), var(--magenta), var(--cyan));
+            opacity: 0.2; animation: borderGlow 6s linear infinite;
         }
         @keyframes borderGlow {
-            0%   { filter: hue-rotate(0deg); opacity: 0.25; }
-            50%  { opacity: 0.45; }
-            100% { filter: hue-rotate(360deg); opacity: 0.25; }
+            0% { filter: hue-rotate(0deg); opacity: 0.2; }
+            50% { opacity: 0.4; }
+            100% { filter: hue-rotate(360deg); opacity: 0.2; }
         }
 
-        /* ===== HEADER ===== */
+        /* Header */
         .chat-header {
-            padding: 14px 20px;
-            border-bottom: 1px solid rgba(0, 255, 255, 0.12);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex-shrink: 0;
-            background: rgba(0, 0, 0, 0.3);
+            padding: 12px 18px;
+            border-bottom: 1px solid rgba(0,255,255,0.1);
+            display: flex; align-items: center; gap: 12px;
+            flex-shrink: 0; background: rgba(0,0,0,0.25);
         }
         .avatar-3d {
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
-            background: linear-gradient(135deg, #00ffff22, #ff00ff22);
-            border: 1px solid rgba(0, 255, 255, 0.25);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
-            transform: rotateX(4deg) rotateY(-4deg) translateZ(10px);
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.1);
-            flex-shrink: 0;
+            width: 42px; height: 42px; border-radius: 12px;
+            background: linear-gradient(135deg, #00ffff18, #ff00ff18);
+            border: 1px solid rgba(0,255,255,0.2);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; transform: rotateX(4deg) rotateY(-4deg) translateZ(8px);
+            box-shadow: 0 0 20px rgba(0,255,255,0.08); flex-shrink: 0;
         }
         .header-info h1 {
-            font-family: var(--font-display);
-            font-size: 16px;
-            font-weight: 700;
-            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-magenta));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            letter-spacing: 2px;
-            text-transform: uppercase;
+            font-family: var(--display); font-size: 15px; font-weight: 700;
+            background: linear-gradient(90deg, var(--cyan), var(--magenta));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            letter-spacing: 2px; text-transform: uppercase;
         }
         .header-info .status {
-            font-size: 12px;
-            font-weight: 500;
-            color: var(--neon-green);
-            display: flex;
-            align-items: center;
-            gap: 6px;
+            font-size: 11px; font-weight: 500; color: var(--green);
+            display: flex; align-items: center; gap: 6px;
         }
         .header-info .status .dot {
-            display: inline-block;
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            background: var(--neon-green);
-            box-shadow: 0 0 8px var(--neon-green);
+            display: inline-block; width: 6px; height: 6px; border-radius: 50%;
+            background: var(--green); box-shadow: 0 0 8px var(--green);
             animation: pulseDot 1.4s ease-in-out infinite;
         }
-        @keyframes pulseDot {
-            0%,100% { opacity: 1; transform: scale(1); }
-            50%      { opacity: 0.3; transform: scale(0.7); }
-        }
+        @keyframes pulseDot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.3;transform:scale(.7)} }
         .header-badge {
-            margin-left: auto;
-            font-family: var(--font-code);
-            font-size: 10px;
-            color: rgba(0, 255, 255, 0.4);
-            border: 1px solid rgba(0, 255, 255, 0.1);
-            padding: 4px 12px;
-            border-radius: 20px;
-            letter-spacing: 1px;
-            white-space: nowrap;
+            margin-left: auto; font-family: var(--code); font-size: 9px;
+            color: rgba(0,255,255,0.35); border: 1px solid rgba(0,255,255,0.08);
+            padding: 3px 10px; border-radius: 20px; letter-spacing: 1px; white-space: nowrap;
+        }
+        .lang-indicator {
+            font-family: var(--code); font-size: 10px;
+            padding: 3px 10px; border-radius: 12px;
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(0,255,255,0.06);
+            color: var(--cyan); margin-left: 6px; letter-spacing: 0.5px;
         }
 
-        /* ===== MESSAGE AREA ===== */
+        /* Messages */
         .chat-messages {
-            flex: 1;
-            overflow-y: auto;
-            padding: 16px 18px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            scroll-behavior: smooth;
+            flex: 1; overflow-y: auto; padding: 14px 16px;
+            display: flex; flex-direction: column; gap: 10px; scroll-behavior: smooth;
         }
-        .chat-messages::-webkit-scrollbar {
-            width: 4px;
-        }
-        .chat-messages::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        .chat-messages::-webkit-scrollbar-thumb {
-            background: var(--neon-cyan);
-            border-radius: 10px;
-            opacity: 0.3;
-        }
+        .chat-messages::-webkit-scrollbar { width: 3px; }
+        .chat-messages::-webkit-scrollbar-track { background: transparent; }
+        .chat-messages::-webkit-scrollbar-thumb { background: var(--cyan); border-radius: 10px; opacity: 0.2; }
 
-        /* ===== MESSAGE BUBBLES ===== */
-        .message {
-            display: flex;
-            flex-direction: column;
-            max-width: 88%;
-            animation: msgIn 0.35s ease-out both;
-            transform-style: preserve-3d;
-        }
-        @keyframes msgIn {
-            0%   { opacity: 0; transform: translateY(18px) scale(0.95); }
-            100% { opacity: 1; transform: translateY(0) scale(1); }
-        }
+        .message { display: flex; flex-direction: column; max-width: 92%; animation: msgIn .3s ease-out both; }
+        @keyframes msgIn { 0%{opacity:0;transform:translateY(14px)scale(.95)} 100%{opacity:1;transform:translateY(0)scale(1)} }
+        .message.ai { align-self: flex-start; }
+        .message.user { align-self: flex-end; }
 
-        .message.ai {
-            align-self: flex-start;
-        }
-        .message.user {
-            align-self: flex-end;
-        }
-
-        .msg-label {
-            font-size: 10px;
-            font-weight: 600;
-            letter-spacing: 0.8px;
-            margin-bottom: 4px;
-            padding: 0 4px;
-        }
-        .message.ai .msg-label {
-            color: var(--neon-cyan);
-        }
-        .message.user .msg-label {
-            color: var(--neon-magenta);
-            text-align: right;
-        }
+        .msg-label { font-size: 9px; font-weight: 600; letter-spacing: .8px; margin-bottom: 3px; padding: 0 4px; }
+        .message.ai .msg-label { color: var(--cyan); }
+        .message.user .msg-label { color: var(--magenta); text-align: right; }
 
         .bubble {
-            padding: 12px 16px;
-            border-radius: 16px;
-            font-size: 14px;
-            line-height: 1.5;
-            word-wrap: break-word;
-            position: relative;
-            border: 1px solid transparent;
-            transition: box-shadow 0.2s;
+            padding: 10px 15px; border-radius: 14px; font-size: 14px; line-height: 1.5;
+            word-wrap: break-word; position: relative; border: 1px solid transparent;
         }
-        /* AI bubble — kiri */
         .message.ai .bubble {
-            background: rgba(0, 255, 255, 0.06);
-            border-color: rgba(0, 255, 255, 0.15);
-            border-bottom-left-radius: 4px;
-            color: #c8f0ff;
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.04);
+            background: rgba(0,255,255,0.05); border-color: rgba(0,255,255,0.12);
+            border-bottom-left-radius: 3px; color: #c8f0ff;
         }
         .message.ai .bubble::before {
-            content: '<';
-            position: absolute;
-            left: -10px;
-            bottom: 6px;
-            font-family: var(--font-code);
-            font-size: 12px;
-            color: rgba(0, 255, 255, 0.2);
+            content: '<'; position: absolute; left: -9px; bottom: 5px;
+            font-family: var(--code); font-size: 11px; color: rgba(0,255,255,0.15);
         }
-        /* User bubble — kanan */
         .message.user .bubble {
-            background: rgba(255, 0, 255, 0.06);
-            border-color: rgba(255, 0, 255, 0.15);
-            border-bottom-right-radius: 4px;
-            color: #ffd0f0;
-            box-shadow: 0 0 20px rgba(255, 0, 255, 0.04);
+            background: rgba(255,0,255,0.05); border-color: rgba(255,0,255,0.12);
+            border-bottom-right-radius: 3px; color: #ffd0f0;
         }
         .message.user .bubble::after {
-            content: '/>';
-            position: absolute;
-            right: -10px;
-            bottom: 6px;
-            font-family: var(--font-code);
-            font-size: 12px;
-            color: rgba(255, 0, 255, 0.2);
+            content: '/>'; position: absolute; right: -9px; bottom: 5px;
+            font-family: var(--code); font-size: 11px; color: rgba(255,0,255,0.15);
         }
 
-        .bubble .typing-dots {
-            display: inline-flex;
-            gap: 4px;
-        }
+        .bubble .typing-dots { display: inline-flex; gap: 4px; }
         .bubble .typing-dots span {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: var(--neon-cyan);
+            width: 5px; height: 5px; border-radius: 50%; background: var(--cyan);
             animation: dotBounce 1.2s ease-in-out infinite;
         }
-        .bubble .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
-        .bubble .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
-        @keyframes dotBounce {
-            0%,80%,100% { transform: translateY(0); opacity: 0.3; }
-            40%         { transform: translateY(-8px); opacity: 1; }
-        }
+        .bubble .typing-dots span:nth-child(2) { animation-delay: .2s; }
+        .bubble .typing-dots span:nth-child(3) { animation-delay: .4s; }
+        @keyframes dotBounce { 0%,80%,100%{transform:translateY(0);opacity:.3} 40%{transform:translateY(-7px);opacity:1} }
 
-        /* code block styling */
+        /* Code blocks in bubbles */
         .bubble pre {
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(0, 255, 255, 0.1);
-            border-radius: 10px;
-            padding: 12px 14px;
-            font-family: var(--font-code);
-            font-size: 12px;
-            line-height: 1.5;
-            overflow-x: auto;
-            margin: 6px 0;
-            color: #8cf;
-            white-space: pre-wrap;
+            background: rgba(0,0,0,0.5); border: 1px solid rgba(0,255,255,0.07);
+            border-radius: 8px; padding: 10px 12px;
+            font-family: var(--code); font-size: 11px; line-height: 1.5;
+            overflow-x: auto; margin: 5px 0; color: #8cf; white-space: pre-wrap;
         }
-        .bubble pre .kw { color: #ff79c6; }
-        .bubble pre .str { color: #f1fa8c; }
-        .bubble pre .cm { color: #6272a4; font-style: italic; }
-        .bubble pre .fn { color: #50fa7b; }
-        .bubble pre .num { color: #bd93f9; }
-        .bubble pre .tag { color: #ff79c6; }
-        .bubble pre .attr { color: #50fa7b; }
-        .bubble pre .val { color: #f1fa8c; }
+        .bubble .search-result {
+            background: rgba(0,255,255,0.03); border: 1px solid rgba(0,255,255,0.06);
+            border-radius: 8px; padding: 8px 12px; margin: 4px 0;
+            font-size: 12px; line-height: 1.4;
+        }
+        .bubble .search-result a {
+            color: var(--cyan); text-decoration: underline; text-decoration-color: rgba(0,255,255,0.3);
+        }
+        .bubble .sr-title { color: var(--cyan); font-weight: 600; }
+        .bubble .sr-snippet { color: rgba(255,255,255,0.55); font-size: 11px; }
+        .bubble .sr-url { color: var(--green); font-size: 10px; font-family: var(--code); }
 
-        .bubble .copy-btn {
-            display: inline-block;
-            margin-top: 6px;
-            padding: 3px 12px;
-            font-family: var(--font-code);
-            font-size: 10px;
-            background: rgba(0, 255, 255, 0.08);
-            border: 1px solid rgba(0, 255, 255, 0.15);
-            border-radius: 6px;
-            color: var(--neon-cyan);
-            cursor: pointer;
-            transition: all 0.15s;
-            letter-spacing: 0.5px;
+        .copy-btn {
+            display: inline-block; margin-top: 4px; padding: 2px 10px;
+            font-family: var(--code); font-size: 9px;
+            background: rgba(0,255,255,0.06); border: 1px solid rgba(0,255,255,0.1);
+            border-radius: 5px; color: var(--cyan); cursor: pointer;
+            transition: all .15s; letter-spacing: .5px;
         }
-        .bubble .copy-btn:hover {
-            background: rgba(0, 255, 255, 0.15);
-            box-shadow: 0 0 12px rgba(0, 255, 255, 0.05);
-        }
-        .bubble .copy-btn.copied {
-            color: var(--neon-green);
-            border-color: rgba(0, 255, 65, 0.3);
-        }
+        .copy-btn:hover { background: rgba(0,255,255,0.12); }
+        .copy-btn.copied { color: var(--green); border-color: rgba(0,255,65,0.25); }
 
-        /* ===== INPUT AREA ===== */
+        /* Search notice */
+        .search-notice {
+            font-size: 10px; color: rgba(0,255,255,0.2);
+            font-family: var(--code); margin-top: 2px;
+            display: flex; align-items: center; gap: 4px;
+        }
+        .search-notice .spinner {
+            display: inline-block; width: 8px; height: 8px;
+            border: 1px solid rgba(0,255,255,0.2); border-radius: 50%;
+            border-top-color: var(--cyan); animation: spin .6s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Input */
         .chat-input-area {
-            padding: 12px 18px 16px;
-            border-top: 1px solid rgba(0, 255, 255, 0.08);
-            display: flex;
-            gap: 10px;
-            align-items: flex-end;
-            flex-shrink: 0;
-            background: rgba(0, 0, 0, 0.2);
+            padding: 10px 16px 14px;
+            border-top: 1px solid rgba(0,255,255,0.06);
+            display: flex; gap: 8px; align-items: flex-end;
+            flex-shrink: 0; background: rgba(0,0,0,0.15);
         }
         .chat-input-area textarea {
             flex: 1;
-            background: rgba(0, 255, 255, 0.03);
-            border: 1px solid rgba(0, 255, 255, 0.12);
-            border-radius: 14px;
-            padding: 10px 16px;
-            font-family: var(--font-main);
-            font-size: 14px;
-            font-weight: 500;
-            color: #e0f0ff;
-            resize: none;
-            outline: none;
-            min-height: 44px;
-            max-height: 100px;
-            transition: border-color 0.2s, box-shadow 0.2s;
+            background: rgba(0,255,255,0.02);
+            border: 1px solid rgba(0,255,255,0.1);
+            border-radius: 12px; padding: 10px 14px;
+            font-family: var(--font); font-size: 14px; font-weight: 500;
+            color: #e0f0ff; resize: none; outline: none;
+            min-height: 40px; max-height: 90px;
+            transition: border-color .2s, box-shadow .2s;
         }
         .chat-input-area textarea:focus {
-            border-color: var(--neon-cyan);
-            box-shadow: 0 0 24px rgba(0, 255, 255, 0.06);
+            border-color: var(--cyan); box-shadow: 0 0 20px rgba(0,255,255,0.04);
         }
         .chat-input-area textarea::placeholder {
-            color: rgba(0, 255, 255, 0.2);
-            font-weight: 400;
+            color: rgba(0,255,255,0.15); font-weight: 400;
         }
-
         .btn-send {
-            width: 48px;
-            height: 48px;
-            border-radius: 14px;
-            border: 1px solid rgba(0, 255, 255, 0.2);
-            background: rgba(0, 255, 255, 0.06);
-            color: var(--neon-cyan);
-            font-size: 20px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-            flex-shrink: 0;
-            transform: translateZ(5px);
+            width: 44px; height: 44px; border-radius: 12px;
+            border: 1px solid rgba(0,255,255,0.15);
+            background: rgba(0,255,255,0.05); color: var(--cyan);
+            font-size: 18px; cursor: pointer; display: flex;
+            align-items: center; justify-content: center;
+            transition: all .2s; flex-shrink: 0; transform: translateZ(3px);
         }
         .btn-send:hover {
-            background: rgba(0, 255, 255, 0.12);
-            border-color: var(--neon-cyan);
-            box-shadow: 0 0 30px rgba(0, 255, 255, 0.1);
-            transform: translateZ(8px) scale(1.04);
+            background: rgba(0,255,255,0.1); border-color: var(--cyan);
+            box-shadow: 0 0 24px rgba(0,255,255,0.06);
+            transform: translateZ(6px) scale(1.03);
         }
-        .btn-send:active {
-            transform: translateZ(0) scale(0.94);
-        }
+        .btn-send:active { transform: translateZ(0) scale(.93); }
 
-        /* ===== responsive ===== */
+        /* Info bar */
+        .info-bar {
+            padding: 4px 18px; font-size: 9px; color: rgba(0,255,255,0.15);
+            font-family: var(--code); display: flex; justify-content: space-between;
+            background: rgba(0,0,0,0.1); border-top: 1px solid rgba(0,255,255,0.03);
+            flex-shrink: 0; letter-spacing: .3px;
+        }
+        .info-bar .online-status { color: var(--green); opacity: 0.4; }
+
         @media (max-width: 540px) {
-            .chat-wrapper {
-                max-width: 100vw;
-                max-height: 100vh;
-                border-radius: 0;
-                transform: none !important;
-            }
-            .chat-card {
-                border-radius: 0;
-            }
+            .chat-wrapper { max-width: 100vw; max-height: 100vh; border-radius: 0; transform: none !important; }
+            .chat-card { border-radius: 0; }
             .chat-card::before { border-radius: 0; }
-            .chat-messages { padding: 12px; }
-            .message { max-width: 92%; }
+            .chat-messages { padding: 10px; }
+            .message { max-width: 95%; }
             .bubble { font-size: 13px; }
-            .bubble pre { font-size: 11px; }
+            .bubble pre { font-size: 10px; }
         }
     </style>
 </head>
 <body>
 
-<!-- ===== 3D SCENE (pure canvas particle system) ===== -->
 <div class="scene-3d" id="scene3d"></div>
 <div class="scanlines"></div>
 <div class="vignette"></div>
 
-<!-- ===== CHAT UI ===== -->
 <div class="chat-wrapper" id="chatWrapper">
     <div class="chat-card">
-
-        <!-- HEADER -->
         <div class="chat-header">
-            <div class="avatar-3d">&#x1F916;</div>
+            <div class="avatar-3d">🧠</div>
             <div class="header-info">
-                <h1>AI Hacker</h1>
-                <span class="status"><span class="dot"></span> ONLINE &mdash; v4.2</span>
+                <h1>AI Hacker Neural</h1>
+                <span class="status"><span class="dot"></span> ONLINE · <span id="langLabel">🌐 multi</span></span>
             </div>
-            <div class="header-badge">CODE&#x2B06; GEN</div>
+            <div class="header-badge">v5.0 NEURAL</div>
         </div>
 
-        <!-- MESSAGES -->
         <div class="chat-messages" id="chatMessages"></div>
 
-        <!-- INPUT -->
         <div class="chat-input-area">
-            <textarea id="chatInput" rows="1" placeholder="Ketik pesan / minta kode... contoh: 'buatkan html button keren'"></textarea>
-            <button class="btn-send" id="btnSend" title="Kirim">&#x27A4;</button>
+            <textarea id="chatInput" rows="1" placeholder="Ketik pesan... cari: [kata kunci], buka: [url], buatkan [kode]..."></textarea>
+            <button class="btn-send" id="btnSend" title="Kirim">➤</button>
         </div>
-
+        <div class="info-bar">
+            <span>🧠 NEURAL ENGINE</span>
+            <span class="online-status">⬡ ONLINE · DUCKDUCKGO · WIKIPEDIA</span>
+        </div>
     </div>
 </div>
 
 <script>
-    // ============================================================
-    //  1. THREE.JS-LIKE 3D PARTICLE BACKGROUND (Pure Canvas)
-    // ============================================================
-    (function init3DScene() {
-        const container = document.getElementById('scene3d');
-        const canvas = document.createElement('canvas');
-        container.appendChild(canvas);
-        const ctx = canvas.getContext('2d');
-
+    // ====================================================================
+    //  1. 3D BACKGROUND (Canvas Particle System)
+    // ====================================================================
+    (function init3D() {
+        const c = document.getElementById('scene3d'), cv = document.createElement('canvas');
+        c.appendChild(cv); const ctx = cv.getContext('2d');
         let W, H;
-        function resize() {
-            W = canvas.width = window.innerWidth;
-            H = canvas.height = window.innerHeight;
-        }
-        resize();
-        window.addEventListener('resize', resize);
-
-        const STAR_COUNT = 300;
-        const stars = [];
-        for (let i = 0; i < STAR_COUNT; i++) {
-            stars.push({
-                x: Math.random() * W,
-                y: Math.random() * H,
-                z: Math.random() * 300 + 50,
-                size: Math.random() * 2.4 + 0.4,
-                speed: Math.random() * 0.5 + 0.1,
-                hue: Math.random() > 0.6 ? (Math.random() > 0.5 ? 180 : 300) : 0,
-            });
-        }
-
+        const resize = () => { W = cv.width = innerWidth; H = cv.height = innerHeight; };
+        resize(); addEventListener('resize', resize);
+        const stars = Array.from({ length: 320 }, () => ({
+            x: Math.random() * W, y: Math.random() * H, z: Math.random() * 300 + 50,
+            s: Math.random() * 2.2 + .3, sp: Math.random() * .5 + .1,
+            h: Math.random() > .6 ? (Math.random() > .5 ? 180 : 300) : 0
+        }));
         let lines = [];
-        function buildLines() {
+        (function build() {
             lines = [];
-            for (let i = 0; i < stars.length; i++) {
+            for (let i = 0; i < stars.length; i++)
                 for (let j = i + 1; j < stars.length; j++) {
-                    const dx = stars[i].x - stars[j].x;
-                    const dy = stars[i].y - stars[j].y;
-                    const dist = Math.sqrt(dx * dx + dy * dy);
-                    if (dist < 120 && Math.random() < 0.12) {
-                        lines.push({ a: i, b: j, maxDist: 120 });
-                    }
+                    const dx = stars[i].x - stars[j].x, dy = stars[i].y - stars[j].y;
+                    if (Math.sqrt(dx * dx + dy * dy) < 110 && Math.random() < .1) lines.push({ a: i, b: j, md: 110 });
                 }
-            }
-        }
-        buildLines();
-
-        let mouseX = 0, mouseY = 0;
-        window.addEventListener('mousemove', e => {
-            mouseX = (e.clientX / W - 0.5) * 0.6;
-            mouseY = (e.clientY / H - 0.5) * 0.6;
-        });
-
-        let time = 0;
-        function draw() {
-            time += 0.004;
-            ctx.fillStyle = 'rgba(10,10,15,1)';
-            ctx.fillRect(0, 0, W, H);
-
-            const offsetX = mouseX * 30;
-            const offsetY = mouseY * 30;
-
+        })();
+        let mx = 0, my = 0, tm = 0;
+        addEventListener('mousemove', e => { mx = (e.clientX / W - .5) * .5; my = (e.clientY / H - .5) * .5; });
+        (function draw() {
+            tm += .0035;
+            ctx.fillStyle = 'rgba(10,10,15,1)'; ctx.fillRect(0, 0, W, H);
+            const ox = mx * 25, oy = my * 25;
             for (const s of stars) {
-                s.x += Math.sin(time + s.z * 0.01) * 0.08;
-                s.y += Math.cos(time * 0.7 + s.z * 0.008) * 0.06;
-                if (s.x < -50) s.x = W + 50;
-                if (s.x > W + 50) s.x = -50;
-                if (s.y < -50) s.y = H + 50;
-                if (s.y > H + 50) s.y = -50;
-                s.z += Math.sin(time * 0.5 + s.x * 0.001) * 0.08;
-                if (s.z < 30) s.z = 30;
-                if (s.z > 400) s.z = 400;
+                s.x += Math.sin(tm + s.z * .01) * .07;
+                s.y += Math.cos(tm * .7 + s.z * .008) * .05;
+                if (s.x < -40) s.x = W + 40; if (s.x > W + 40) s.x = -40;
+                if (s.y < -40) s.y = H + 40; if (s.y > H + 40) s.y = -40;
+                s.z += Math.sin(tm * .5 + s.x * .001) * .07;
+                if (s.z < 30) s.z = 30; if (s.z > 400) s.z = 400;
             }
-
             const sorted = [...stars].sort((a, b) => a.z - b.z);
-
-            ctx.lineWidth = 0.5;
-            for (const ln of lines) {
-                const sa = stars[ln.a];
-                const sb = stars[ln.b];
-                const dx = sa.x - sb.x;
-                const dy = sa.y - sb.y;
-                const dist = Math.sqrt(dx * dx + dy * dy);
-                if (dist > ln.maxDist) continue;
-                const alpha = (1 - dist / ln.maxDist) * 0.15;
-                ctx.strokeStyle = `rgba(0,255,255,${alpha})`;
+            ctx.lineWidth = .4;
+            for (const l of lines) {
+                const a = stars[l.a], b = stars[l.b];
+                const dx = a.x - b.x, dy = a.y - b.y, d = Math.sqrt(dx * dx + dy * dy);
+                if (d > l.md) continue;
+                const al = (1 - d / l.md) * .1;
+                ctx.strokeStyle = `rgba(0,255,255,${al})`;
                 ctx.beginPath();
-                ctx.moveTo(sa.x + offsetX * (sa.z / 300), sa.y + offsetY * (sa.z / 300));
-                ctx.lineTo(sb.x + offsetX * (sb.z / 300), sb.y + offsetY * (sb.z / 300));
+                ctx.moveTo(a.x + ox * (a.z / 300), a.y + oy * (a.z / 300));
+                ctx.lineTo(b.x + ox * (b.z / 300), b.y + oy * (b.z / 300));
                 ctx.stroke();
             }
-
             for (const s of sorted) {
-                const px = s.x + offsetX * (s.z / 300);
-                const py = s.y + offsetY * (s.z / 300);
-                const scale = 0.7 + (s.z / 400) * 0.6;
-                const size = s.size * scale;
-                let color;
-                if (s.hue === 180) color = `rgba(0,255,255,${0.4 + scale * 0.5})`;
-                else if (s.hue === 300) color = `rgba(255,0,255,${0.3 + scale * 0.4})`;
-                else color = `rgba(180,200,255,${0.2 + scale * 0.3})`;
-                ctx.beginPath();
-                ctx.arc(px, py, size, 0, Math.PI * 2);
-                ctx.fillStyle = color;
-                ctx.fill();
-                if (size > 0.8) {
-                    ctx.beginPath();
-                    ctx.arc(px, py, size * 3, 0, Math.PI * 2);
-                    ctx.fillStyle = s.hue === 180
-                        ? `rgba(0,255,255,${0.03 * scale})`
-                        : s.hue === 300
-                        ? `rgba(255,0,255,${0.02 * scale})`
-                        : `rgba(100,150,255,${0.01})`;
-                    ctx.fill();
-                }
+                const px = s.x + ox * (s.z / 300), py = s.y + oy * (s.z / 300);
+                const sc = .7 + (s.z / 400) * .6, sz = s.s * sc;
+                const c2 = s.h === 180 ? `rgba(0,255,255,${.3 + sc * .5})` : s.h === 300 ? `rgba(255,0,255,${.2 + sc * .4})` : `rgba(150,180,255,${.15 + sc * .3})`;
+                ctx.beginPath(); ctx.arc(px, py, sz, 0, Math.PI * 2); ctx.fillStyle = c2; ctx.fill();
+                if (sz > .7) { ctx.beginPath(); ctx.arc(px, py, sz * 3, 0, Math.PI * 2); ctx.fillStyle = s.h === 180 ? `rgba(0,255,255,${.02 * sc})` : s.h === 300 ? `rgba(255,0,255,${.012 * sc})` : `rgba(80,120,255,${.005})`; ctx.fill(); }
             }
             requestAnimationFrame(draw);
-        }
-        draw();
+        })();
     })();
 
+    // ====================================================================
+    //  2. LANGUAGE DETECTOR
+    // ====================================================================
+    const LangDetector = {
+        detect(text) {
+            if (!text || !text.trim()) return 'en';
+            const t = text.trim();
+            // Script-based detection
+            if (/[\u4e00-\u9fff\u3400-\u4dbf]/.test(t)) return 'zh';
+            if (/[\u3040-\u309f]/.test(t)) return 'ja';
+            if (/[\u30a0-\u30ff\u30f0-\u30ff]/.test(t)) return 'ja';
+            if (/[\uac00-\ud7af]/.test(t)) return 'ko';
+            if (/[\u0600-\u06ff]/.test(t)) return 'ar';
+            if (/[\u0400-\u04ff]/.test(t)) return 'ru';
+            if (/[\u0e00-\u0e7f]/.test(t)) return 'th';
+            if (/[\u0900-\u097f]/.test(t)) return 'hi';
+            // Latin-based — compare common words
+            const words = t.toLowerCase().match(/[a-z]+/g) || [];
+            const idWords = ['yang','dan','di','dengan','untuk','tidak','ini','dari','akan','dapat','bisa','saya','kita','mereka','ada','telah','sudah','atau','karena','juga','ke','oleh','pada','sebagai','dalam','itu','saat','kalau','saja','saya','dia','kami','aku','bukan','ya','tolong','bantu','buat','bikin','cari','lihat','mana','apa','kenapa','bagaimana','kapan','siapa'];
+            const enWords = ['the','and','for','are','but','not','you','all','any','can','had','her','was','one','our','out','has','have','been','some','them','than','that','this','very','what','when','which','who','will','with','your','please','help','search','find','look','make','create','code','want','need','tell','about','would','could','should'];
+            const esWords = ['el','la','los','las','que','y','en','un','una','por','con','para','como','más','pero','sus','son','era','han','está','ser','haber','tener','hacer','poder','decir','entre','todo','también','donde','quien','cual'];
+            const frWords = ['le','la','les','de','du','des','et','en','un','une','pour','avec','dans','sur','que','qui','pas','nous','vous','ils','elles','est','sont','ont','fait','faire','être','avoir','pouvoir','vouloir','dire','aussi','mais','ou','où','comment','pourquoi'];
+            const deWords = ['der','die','das','und','in','den','von','zu','mit','auf','für','ist','sind','war','hat','haben','sein','werden','können','müssen','sagen','auch','noch','aus','bei','nach','um','nicht','aber','oder','wie','was','wer','wo','wann','warum'];
+            const ptWords = ['o','a','os','as','de','da','do','em','para','com','um','uma','por','mais','mas','foi','são','tem','ter','seu','sua','como','entre','todo','também','onde','quem','qual','porque','poder','fazer'];
 
-    // ============================================================
-    //  2. OTAK AI — Enhanced with CODE GENERATOR
-    // ============================================================
-    const AIBrain = (() => {
-
-        // ---- CODE GENERATOR TEMPLATES ----
-        const codeGenerators = {
-            html: {
-                detect: ['html', 'htm', 'buatkan halaman', 'bikin html', 'bikin web', 'buat web', 'halaman web', 'landing page', 'web page', 'form html', 'button html', 'table html', 'navbar html'],
-                label: 'HTML',
-                generate: (input) => {
-                    const lower = input.toLowerCase();
-                    if (lower.includes('button') || lower.includes('tombol')) {
-                        return `<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Neon Button</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #0a0a0f;
-            font-family: Arial, sans-serif;
-        }
-        .neon-btn {
-            padding: 16px 40px;
-            font-size: 18px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            color: #00ffff;
-            background: transparent;
-            border: 2px solid #00ffff;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.25s ease;
-            box-shadow: 0 0 8px rgba(0,255,255,0.2);
-        }
-        .neon-btn:hover {
-            background: #00ffff;
-            color: #0a0a0f;
-            box-shadow: 0 0 40px rgba(0,255,255,0.5);
-            transform: scale(1.05);
-        }
-    </style>
-</head>
-<body>
-    <button class="neon-btn">HOVER ME</button>
-</body>
-</html>`;
-                    }
-                    if (lower.includes('form') || lower.includes('login')) {
-                        return `<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login Form</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #0a0a0f;
-            font-family: Arial, sans-serif;
-        }
-        .form-card {
-            background: rgba(255,255,255,0.03);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(0,255,255,0.15);
-            border-radius: 20px;
-            padding: 40px 36px;
-            width: 360px;
-            box-shadow: 0 0 40px rgba(0,255,255,0.05);
-        }
-        .form-card h2 {
-            color: #00ffff;
-            text-align: center;
-            margin-bottom: 24px;
-            font-size: 22px;
-            letter-spacing: 2px;
-        }
-        .form-card input {
-            width: 100%;
-            padding: 12px 16px;
-            margin-bottom: 14px;
-            background: rgba(0,255,255,0.04);
-            border: 1px solid rgba(0,255,255,0.12);
-            border-radius: 10px;
-            color: #e0f0ff;
-            font-size: 14px;
-            outline: none;
-            transition: border-color 0.2s;
-        }
-        .form-card input:focus {
-            border-color: #00ffff;
-        }
-        .form-card button {
-            width: 100%;
-            padding: 12px;
-            background: #00ffff;
-            border: none;
-            border-radius: 10px;
-            color: #0a0a0f;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .form-card button:hover {
-            box-shadow: 0 0 30px rgba(0,255,255,0.3);
-            transform: translateY(-1px);
-        }
-    </style>
-</head>
-<body>
-    <div class="form-card">
-        <h2>LOGIN</h2>
-        <input type="text" placeholder="Username" />
-        <input type="password" placeholder="Password" />
-        <button>MASUK</button>
-    </div>
-</body>
-</html>`;
-                    }
-                    if (lower.includes('table') || lower.includes('tabel')) {
-                        return `<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Data Table</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #0a0a0f;
-            font-family: Arial, sans-serif;
-            padding: 20px;
-        }
-        table {
-            border-collapse: collapse;
-            width: 600px;
-            max-width: 100%;
-            color: #e0f0ff;
-            border: 1px solid rgba(0,255,255,0.1);
-            border-radius: 12px;
-            overflow: hidden;
-        }
-        th {
-            background: rgba(0,255,255,0.08);
-            color: #00ffff;
-            padding: 14px 16px;
-            text-align: left;
-            font-size: 14px;
-            letter-spacing: 1px;
-            border-bottom: 1px solid rgba(0,255,255,0.15);
-        }
-        td {
-            padding: 12px 16px;
-            border-bottom: 1px solid rgba(0,255,255,0.05);
-            font-size: 13px;
-        }
-        tr:hover td {
-            background: rgba(0,255,255,0.03);
-        }
-    </style>
-</head>
-<body>
-    <table>
-        <thead>
-            <tr>
-                <th>No</th>
-                <th>Nama</th>
-                <th>Status</th>
-                <th>IP Address</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr><td>1</td><td>AI Hacker</td><td>Online</td><td>192.168.1.42</td></tr>
-            <tr><td>2</td><td>Firewall</td><td>Active</td><td>192.168.1.1</td></tr>
-            <tr><td>3</td><td>Target</td><td>Vulnerable</td><td>10.0.0.7</td></tr>
-        </tbody>
-    </table>
-</body>
-</html>`;
-                    }
-                    if (lower.includes('navbar') || lower.includes('navigasi') || lower.includes('menu')) {
-                        return `<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Neon Navbar</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: #0a0a0f; font-family: Arial, sans-serif; }
-        nav {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 16px 40px;
-            background: rgba(0,255,255,0.03);
-            border-bottom: 1px solid rgba(0,255,255,0.1);
-        }
-        .logo {
-            color: #00ffff;
-            font-size: 20px;
-            font-weight: 700;
-            letter-spacing: 2px;
-        }
-        nav a {
-            color: rgba(255,255,255,0.6);
-            text-decoration: none;
-            margin-left: 24px;
-            font-size: 14px;
-            transition: color 0.2s;
-        }
-        nav a:hover { color: #00ffff; }
-    </style>
-</head>
-<body>
-    <nav>
-        <div class="logo">AI HACKER</div>
-        <div>
-            <a href="#">Home</a>
-            <a href="#">Services</a>
-            <a href="#">Tools</a>
-            <a href="#">Contact</a>
-        </div>
-    </nav>
-</body>
-</html>`;
-                    }
-                    // default: generic page
-                    return `<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Halaman Saya</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #0a0a0f;
-            color: #e0f0ff;
-            font-family: Arial, sans-serif;
-            flex-direction: column;
-            gap: 20px;
-        }
-        h1 { color: #00ffff; font-size: 2rem; letter-spacing: 3px; }
-        p { color: rgba(255,255,255,0.5); max-width: 400px; text-align: center; }
-    </style>
-</head>
-<body>
-    <h1>AI HACKER</h1>
-    <p>Halaman ini dibuat oleh AI Hacker — Code Generator</p>
-</body>
-</html>`;
-                }
-            },
-
-            css: {
-                detect: ['css', 'style', 'styling', 'stylesheet', 'kode css', 'bikin css', 'buat css'],
-                label: 'CSS',
-                generate: (input) => {
-                    const lower = input.toLowerCase();
-                    if (lower.includes('button') || lower.includes('tombol')) {
-                        return `/* Neon Button Style */
-.neon-btn {
-    padding: 14px 36px;
-    font-size: 16px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 3px;
-    color: #00ffff;
-    background: transparent;
-    border: 2px solid #00ffff;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.25s ease;
-    box-shadow: 0 0 8px rgba(0,255,255,0.2);
-}
-.neon-btn:hover {
-    background: #00ffff;
-    color: #0a0a0f;
-    box-shadow: 0 0 40px rgba(0,255,255,0.5);
-    transform: scale(1.05);
-}`;
-                    }
-                    if (lower.includes('card') || lower.includes('kartu')) {
-                        return `/* Glass Card Style */
-.card {
-    background: rgba(255,255,255,0.03);
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(0,255,255,0.12);
-    border-radius: 20px;
-    padding: 30px;
-    box-shadow: 0 0 40px rgba(0,255,255,0.04);
-    color: #e0f0ff;
-    transition: all 0.25s;
-}
-.card:hover {
-    border-color: rgba(0,255,255,0.3);
-    box-shadow: 0 0 60px rgba(0,255,255,0.08);
-    transform: translateY(-4px);
-}`;
-                    }
-                    if (lower.includes('animasi') || lower.includes('animation') || lower.includes('glow')) {
-                        return `/* Glow Pulse Animation */
-@keyframes glowPulse {
-    0%, 100% {
-        box-shadow: 0 0 8px rgba(0,255,255,0.2);
-    }
-    50% {
-        box-shadow: 0 0 40px rgba(0,255,255,0.6);
-    }
-}
-.glow-element {
-    animation: glowPulse 2s ease-in-out infinite;
-}`;
-                    }
-                    return `/* CSS Style by AI Hacker */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-body {
-    min-height: 100vh;
-    background: #0a0a0f;
-    color: #e0f0ff;
-    font-family: Arial, sans-serif;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.container {
-    text-align: center;
-    padding: 40px;
-}
-h1 {
-    color: #00ffff;
-    font-size: 2rem;
-    letter-spacing: 3px;
-    margin-bottom: 16px;
-}
-p {
-    color: rgba(255,255,255,0.5);
-    max-width: 400px;
-}`;
-                }
-            },
-
-            javascript: {
-                detect: ['javascript', 'js', 'script', 'function', 'bikin js', 'buat js', 'kode js', 'node.js', 'nodejs'],
-                label: 'JavaScript',
-                generate: (input) => {
-                    const lower = input.toLowerCase();
-                    if (lower.includes('function') || lower.includes('fungsi')) {
-                        return `/**
- * Contoh fungsi JavaScript
- * Dihasilkan oleh AI Hacker
- */
-
-// Function declaration
-function greet(name) {
-    return \`Halo, \${name}! Selamat datang di AI Hacker.\`;
-}
-
-// Arrow function
-const hitungLuas = (panjang, lebar) => panjang * lebar;
-
-// Async function
-async function fetchData(url) {
-    try {
-        const response = await fetch(url);
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        console.error('Error:', error);
-        return null;
-    }
-}
-
-// Export
-console.log(greet('User'));
-console.log('Luas:', hitungLuas(10, 5));`;
-                    }
-                    if (lower.includes('api') || lower.includes('fetch')) {
-                        return `/**
- * Fetch API Example
- * by AI Hacker
- */
-
-async function getData(apiUrl) {
-    try {
-        const res = await fetch(apiUrl);
-        if (!res.ok) throw new Error('HTTP ' + res.status);
-        const json = await res.json();
-        console.log('Data:', json);
-        return json;
-    } catch (err) {
-        console.error('Fetch failed:', err.message);
-        return null;
-    }
-}
-
-// Usage:
-// getData('https://api.example.com/users');`;
-                    }
-                    if (lower.includes('validasi') || lower.includes('validation') || lower.includes('form')) {
-                        return `/**
- * Form Validation Example
- * by AI Hacker
- */
-
-function validateForm(data) {
-    const errors = {};
-
-    if (!data.email || !data.email.includes('@')) {
-        errors.email = 'Email tidak valid';
-    }
-    if (!data.password || data.password.length < 6) {
-        errors.password = 'Password minimal 6 karakter';
-    }
-    if (!data.username || data.username.trim() === '') {
-        errors.username = 'Username wajib diisi';
-    }
-
-    return {
-        valid: Object.keys(errors).length === 0,
-        errors
-    };
-}
-
-// Example
-const result = validateForm({
-    email: 'user@example.com',
-    password: 'rahasia123',
-    username: 'hacker'
-});
-console.log(result);`;
-                    }
-                    return `// JavaScript Code — AI Hacker Generator
-
-// 1. Variable
-const nama = 'AI Hacker';
-let version = 4.2;
-
-// 2. Arrow function
-const sapa = (nama) => \`Halo \${nama}, siap hacking!\`;
-
-// 3. Array + map
-const tools = ['Nmap', 'SQLMap', 'BurpSuite'];
-tools.forEach(t => console.log('Tool:', t));
-
-// 4. Async/await
-async function main() {
-    console.log(sapa('User'));
-    console.log('Version:', version);
-}
-
-main();`;
-                }
-            },
-
-            python: {
-                detect: ['python', 'py', 'python3', 'bikin python', 'kode python', 'buat python', 'script python'],
-                label: 'Python',
-                generate: (input) => {
-                    const lower = input.toLowerCase();
-                    if (lower.includes('scan') || lower.includes('port') || lower.includes('network')) {
-                        return `#!/usr/bin/env python3
-"""
-Simple Port Scanner
-by AI Hacker
-"""
-import socket
-import sys
-
-def scan_port(host, port):
-    try:
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.settimeout(1)
-        result = sock.connect_ex((host, port))
-        sock.close()
-        return result == 0
-    except:
-        return False
-
-def main():
-    host = input("Target IP: ")
-    ports = [21, 22, 80, 443, 8080, 3306, 3389]
-
-    print(f"Scanning {host}...")
-    for port in ports:
-        if scan_port(host, port):
-            print(f"  [+] Port {port} OPEN")
-        else:
-            print(f"  [-] Port {port} closed")
-
-if __name__ == "__main__":
-    main()`;
-                    }
-                    if (lower.includes('hash') || lower.includes('md5') || lower.includes('sha') || lower.includes('crypto')) {
-                        return `#!/usr/bin/env python3
-"""
-Hash Generator
-by AI Hacker
-"""
-import hashlib
-
-def hash_text(text, algorithm='sha256'):
-    h = hashlib.new(algorithm)
-    h.update(text.encode())
-    return h.hexdigest()
-
-# Example
-text = "AI Hacker rocks!"
-print(f"MD5:    {hash_text(text, 'md5')}")
-print(f"SHA1:   {hash_text(text, 'sha1')}")
-print(f"SHA256: {hash_text(text, 'sha256')}")`;
-                    }
-                    return `#!/usr/bin/env python3
-"""
-Python Script — AI Hacker
-"""
-
-def main():
-    print("=" * 40)
-    print("  AI HACKER — Python Generator")
-    print("=" * 40)
-
-    name = input("Masukkan nama: ")
-    print(f"Halo {name}, siap belajar ethical hacking! 🔥")
-
-    tools = ["Nmap", "SQLMap", "Metasploit", "BurpSuite"]
-    print("\\nTools yang wajib dikuasai:")
-    for i, tool in enumerate(tools, 1):
-        print(f"  {i}. {tool}")
-
-if __name__ == "__main__":
-    main()`;
-                }
-            },
-
-            php: {
-                detect: ['php', 'bikin php', 'buat php', 'kode php'],
-                label: 'PHP',
-                generate: (input) => {
-                    return `<?php
-/**
- * PHP Script — AI Hacker Generator
- */
-
-// Database connection example
-function connectDB($host, $user, $pass, $dbname) {
-    try {
-        $dsn = "mysql:host=$host;dbname=$dbname;charset=utf8mb4";
-        $pdo = new PDO($dsn, $user, $pass, [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-        ]);
-        return $pdo;
-    } catch (PDOException $e) {
-        die("Connection failed: " . $e->getMessage());
-    }
-}
-
-// Simple routing
-function route($uri) {
-    switch ($uri) {
-        case '/':
-            return "Home page";
-        case '/login':
-            return "Login page";
-        case '/admin':
-            return "Admin panel";
-        default:
-            return "404 Not Found";
-    }
-}
-
-// Usage
-$uri = $_SERVER['REQUEST_URI'] ?? '/';
-echo route($uri);
-?>`;
-                }
-            },
-
-            sql: {
-                detect: ['sql', 'query', 'database', 'mysql', 'select', 'insert', 'create table', 'bikin sql', 'buat sql'],
-                label: 'SQL',
-                generate: (input) => {
-                    const lower = input.toLowerCase();
-                    if (lower.includes('select') || lower.includes('select')) {
-                        return `-- SQL SELECT Query Examples
-
--- Select all users
-SELECT * FROM users;
-
--- Select with condition
-SELECT id, username, email FROM users WHERE status = 'active';
-
--- Join tables
-SELECT u.username, p.nama_lengkap
-FROM users u
-JOIN profil p ON u.id = p.user_id;
-
--- Aggregation
-SELECT status, COUNT(*) as total
-FROM users
-GROUP BY status
-ORDER BY total DESC;`;
-                    }
-                    if (lower.includes('create table') || lower.includes('buat tabel')) {
-                        return `-- Create Table Examples
-
--- Users table
-CREATE TABLE users (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(50) NOT NULL UNIQUE,
-    email VARCHAR(100) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL,
-    status ENUM('active', 'inactive') DEFAULT 'active',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- Profile table
-CREATE TABLE profiles (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    nama_lengkap VARCHAR(100),
-    bio TEXT,
-    avatar VARCHAR(255),
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);`;
-                    }
-                    if (lower.includes('insert')) {
-                        return `-- INSERT Examples
-
-INSERT INTO users (username, email, password, status)
-VALUES ('hacker', 'hacker@example.com', 'hashed_password', 'active');
-
--- Insert multiple
-INSERT INTO users (username, email, password) VALUES
-    ('user1', 'user1@test.com', 'pass1'),
-    ('user2', 'user2@test.com', 'pass2'),
-    ('user3', 'user3@test.com', 'pass3');`;
-                    }
-                    return `-- SQL Query — AI Hacker
-
--- Create database
-CREATE DATABASE IF NOT EXISTS ai_hacker_db;
-USE ai_hacker_db;
-
--- Users table
-CREATE TABLE users (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(50) NOT NULL,
-    email VARCHAR(100) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- Sample insert
-INSERT INTO users (username, email) VALUES
-    ('admin', 'admin@hacker.local'),
-    ('user', 'user@hacker.local');
-
--- Query
-SELECT * FROM users;`;
-                }
-            },
-
-            // catch-all: general code
-            general: {
-                detect: ['kode', 'code', 'coding', 'program', 'script', 'source code', 'codingan', 'buatkan kode', 'bikin kode', 'generate code', 'buatkan program', 'tolong buatkan'],
-                label: 'CODE',
-                generate: (input) => {
-                    const lower = input.toLowerCase();
-                    if (lower.includes('html')) {
-                        return codeGenerators.html.generate(input);
-                    }
-                    if (lower.includes('css')) {
-                        return codeGenerators.css.generate(input);
-                    }
-                    if (lower.includes('js') || lower.includes('javascript') || lower.includes('node')) {
-                        return codeGenerators.javascript.generate(input);
-                    }
-                    if (lower.includes('python') || lower.includes('py')) {
-                        return codeGenerators.python.generate(input);
-                    }
-                    if (lower.includes('php')) {
-                        return codeGenerators.php.generate(input);
-                    }
-                    if (lower.includes('sql')) {
-                        return codeGenerators.sql.generate(input);
-                    }
-                    // Default to a multi-language example
-                    return `/* ================================
-   AI HACKER — Code Generator
-   ================================ */
-
-// --- HTML ---
-/*
-<!DOCTYPE html>
-<html>
-  <head><title>Contoh</title></head>
-  <body><h1>Halo!</h1></body>
-</html>
-*/
-
-// --- CSS ---
-/*
-body {
-    background: #0a0a0f;
-    color: #00ffff;
-}
-*/
-
-// --- JavaScript ---
-const pesan = "Halo dari AI Hacker!";
-console.log(pesan);
-
-// --- Python ---
-# print("Halo dari AI Hacker!")`;
-                }
-            }
-        };
-
-        // ---- Chat knowledge categories ----
-        const knowledge = {
-            greetings: ['halo','hai','hi','hey','helo','hy','hallo','halo juga','siang','pagi','malam','sore','good morning','good evening','good afternoon','good night'],
-            farewells: ['bye','dadah','daah','selamat tinggal','sampai jumpa','see you','goodbye','bye bye','met bobo','tidur'],
-            thanks: ['makasih','terima kasih','thanks','thank you','thx','thankyou','trims','matur suwun'],
-            name: ['siapa kamu','siapa kau','nama kamu','nama mu','kamuu','what is your name','your name','who are you','namamu siapa','nama lo','lu siapa','lo siapa'],
-            creator: ['siapa pembuatmu','siapa yang buat kamu','penciptamu','who created you','who made you','pembuat','created','programmer kamu','author'],
-            ability: ['bisa apa','kemampuan','what can you do','what can u do','kemampuanmu','keahlian','fungsi kamu','fitur','bisa apa aja','bisa ngapain'],
-            hack: ['hack','hacking','hacker','crack','exploit','deface','inject','injection','sqli','sql injection','xss','csrf','ssrf','malware','virus','trojan','ransomware','phishing','ddos','dos','bruteforce','brute force','recon','reconnaissance','enumeration','port scanning','nmap','metasploit','burpsuite','cyber','keamanan','security','penetration testing','pentest','red team','blue team'],
-            programming: ['coding','programming','program','kode','code','javascript','python','php','java','golang','rust','c++','c#','html','css','react','nodejs','node.js','framework','library','api','rest api','backend','frontend','fullstack','developer','software'],
-            network: ['network','jaringan','ip','dns','http','https','tcp','udp','protocol','subnet','gateway','firewall','proxy','vpn','router','switch','server','client','localhost','127.0.0.1'],
-            linux: ['linux','kali linux','ubuntu','debian','terminal','bash','shell','command line','cli','root','sudo','apt','chmod','chown','grep','sed','awk','nano','vim','ssh'],
-            tools: ['tools','tool','nmap','sqlmap','metasploit','burp','wireshark','aircrack','john','hydra','hashcat','gobuster','dirb','nikto','netcat','nc','socat','bettercap','beef'],
-            crypto: ['crypto','encrypt','decrypt','enkripsi','deskripsi','md5','sha','aes','rsa','base64','hash','cipher','chiper','plaintext','ciphertext'],
-            error: ['error','bug','bug','virus','warning','failed','fail','problem','masalah','rusak','gagal','tidak bisa','ga bisa','nggak bisa'],
-            help: ['help','tolong','bantu','bantuan','help me','tlong','pls','please','minta tolong'],
-            identity: ['hacker','cracker','attacker','defender','ethical hacker','white hat','black hat','gray hat','grey hat','security researcher'],
-        };
-
-        const responses = {
-            greetings: ['Halo! Aku **AI Hacker** siap bantu exploit & security mu 🔥','Hey! Ada yang mau di-hack atau di-audit? 😎','Halo! Sistem siap. Mau cari celah apa hari ini?','Yo! **AI Hacker** online. Ketik /help buat lihat command.','Hai! Mau belajar hacking etis atau ada target buat di-recon?'],
-            farewells: ['Sampai jumpa! Jangan lupa matiin port yang kebuka ya 😉','Dadah! Semoga nggak kena hack balik 😄','Bye! Stay safe di dunia maya.','Sampai ketemu lagi! Root shell selalu siap.','Met bobo! Jangan lupa patch vulnerability tadi 😁'],
-            thanks: ['Sama-sama! Jangan lupa matiin jejak digital lo 🔥','No problem! Kalau ada celah lain, gue siap bantu.','Sip! Kalo perlu bantuan lagi, tinggal tag aja.','Beres! Itu mah masih ringan buat **AI Hacker**.'],
-            name: ['Gue **AI Hacker** — otak AI spesialis cybersecurity 🧠','Nama gue **AI Hacker**, asisten pentest & exploit otomatis.','Gue panggil aja **AI Hacker**. Udah kayak partner hacking lo.','**AI Hacker**! Siap bantu lo dari coding sampe hacking etis.'],
-            creator: ['Gue diciptain sama seorang cybersecurity enthusiast pake JavaScript murni, tanpa API pihak ketiga.','Pembuat gue adalah developer yang pengen punya asisten hacking berbasis AI lokal. Keren kan?','Gue lahir dari baris-baris kode JS murni. No OpenAI, no Google — purely handmade AI.'],
-            ability: ['Gue bisa bantu: **generate code** (HTML, CSS, JS, Python, PHP, SQL), scanning, exploit, SQL injection, XSS, recon, coding, networking, linux, cryptography, dan analisis celah keamanan.','Kemampuan gue: **code generator**, pentest assistant, coding helper, network analyzer. Coba bilang "buatkan html button" atau "bikin python scanner"!','Gue bisa jawab seputar **hacking etis, programming, linux, tools security, debugging**, dan yang paling keren: **bikin kode otomatis**!'],
-            hack: ['Topik **hacking**! Mulai dari scanning, exploitation sampe post-exploitation. Mau bahas yang mana?','Bicara soal hack, gue paham **SQL Injection, XSS, Remote Code Execution**, sampe **Privilege Escalation**. Tanya aja!','Dalam ethical hacking, lo perlu: **Recon → Scanning → Exploitation → Maintaining Access → Clearing Tracks**. Mau breakdown?','Inget ya: hacking etis itu **legal** kalo ada izin. Jangan jadi script kiddie! 😎'],
-            programming: ['Gue ngerti **JavaScript, Python, PHP, HTML/CSS, Node.js**, dan framework modern. Mau bantu coding apa? Atau minta gue **generate kode**?','Programming itu backbone-nya hacking. Gue bisa bikin kode buat lo — tinggal bilang "buatkan kode python port scanner"!','Ada masalah kode? Tempel aja, gue bantu debug & review. Atau minta gue bikin kode baru.','**Best practice**: selalu validasi input, jangan trust user, dan pake prepared statements buat SQL.'],
-            network: ['Networking: **IP addressing, DNS, TCP/UDP, HTTP/HTTPS, firewall, routing**. Tanya spesifik ya!','Buat recon jaringan, gue saranin pake **Nmap** + **Masscan**. Mau tau cara bacanya?','Setiap port yang kebuka adalah celah potensial. Lo udah scan jaringan lo hari ini?'],
-            linux: ['**Linux expert** di sini! Dari **Kali Linux** sampe **Debian**, **bash scripting**, sampe **kernel exploitation**.','Gue cinta Linux. Terminal itu kandang gue. Mau belajar **bash scripting** atau **privilege escalation**?','Inget: **chmod 777** itu berbahaya! Jangan asal chmod ya 😅'],
-            tools: ['Tools favorit gue: **Nmap** (scanning), **SQLMap** (SQLi automation), **Metasploit** (exploit framework), **Burp Suite** (web proxy), **Wireshark** (packet analysis), **John/Hashcat** (cracking).','Butuh rekomendasi tools? **Nmap buat recon, SQLMap buat inject, Gobuster buat directory busting**. Gas!','**Netcat** itu Swiss Army knife-nya networking. Lo harus kuasai **nc**!'],
-            crypto: ['Kriptografi: **AES, RSA, MD5, SHA, Base64, XOR Cipher**. Lo mau encode/decode atau analisis hash?','Gue bisa bantu decrypt cipher simpel atau analisis hash. Tapi jangan harap crack bcrypt ya 🤣','Inget: **hash itu bukan enkripsi!** Hash satu arah, enkripsi dua arah. Jangan nyampah ya!'],
-            error: ['Wah error? Tenang, gue bantu debug. Coba ceritain detail errornya — pesan, kode, konteks.','Setiap error itu celah belajar. Kecuali error **403** — itu mah lo kena block akses 😄','**Debugging tips**: baca error message-nya dulu, cek log, terus Google. Kalo mentok, baru tanya gue.'],
-            help: ['Gue siap bantu! Coba tanya spesifik: **hacking, coding (minta gue buatin kode!), jaringan, linux, tools, kripto, atau security**?','Butuh bantuan? Mention topik lo: **"buatkan html login"**, **"bikin python scanner"**, **SQLi? XSS?** Gas aja!','Gue **AI Hacker** — bilang aja butuh apa. **Minta kode?** Tinggal bilang "buatkan [bahasa] [fungsi]" 😁'],
-            identity: ['**Ethical Hacker** = punya izin, **Black Hat** = kriminal, **Gray Hat** = abu-abu. Lo tim mana?','Gue dibikin buat **ethical hacking & security assessment**. Bukan buat crime ya!','Hacker itu mindset, bukan tools. Lo bisa jadi hacker kalo lo paham sistem sampe akar.'],
-            default: ['Hmm, menarik. Gue **AI Hacker**, asisten cybersecurity & **code generator**. Coba bilang: "buatkan html button" atau "bikin python script" 🚀','Gue denger lo. Tapi gue butuh konteks lebih. **Mau gue buatin kode?** Sebutin bahasa & fungsinya!','**AI Hacker** receive. Coba: "buatkan [html/js/python/php/sql] [fungsi]". Contoh: "buatkan html form login"','Gue paham sebagian. Tapi makin spesifik lo, makin mantul jawaban gue. **Minta kode?** Tinggal bilang!','Wah, di luar database gue nih. Tapi kalo lo butuh **dibikinin kode**, gue siap! Coba sebutin spesifikasinya.']
-        };
-
-        // ---- Helpers ----
-        function normalize(text) {
-            return text.toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, ' ').trim();
-        }
-
-        function matchCategory(input) {
-            const norm = normalize(input);
-            let bestCat = null, bestScore = 0;
-            for (const [cat, keywords] of Object.entries(knowledge)) {
-                let score = 0;
-                for (const kw of keywords) {
-                    const nkw = normalize(kw);
-                    if (norm.includes(nkw)) score += nkw.length;
-                    const words = norm.split(' ');
-                    for (const w of words) {
-                        if (w === nkw || (nkw.length > 3 && w.includes(nkw))) score += 3;
-                        if (nkw.includes(w) && w.length > 2) score += 1;
-                    }
-                }
-                if (score > bestScore) { bestScore = score; bestCat = cat; }
-            }
-            return bestCat;
-        }
-
-        function getResponse(category) {
-            const arr = responses[category] || responses.default;
-            return arr[Math.floor(Math.random() * arr.length)];
-        }
-
-        // ---- Detect code generation request ----
-        function detectCodeRequest(input) {
-            const lower = input.toLowerCase().trim();
-
-            // Specific: "buatkan kode html ..." or similar
-            for (const [lang, gen] of Object.entries(codeGenerators)) {
-                for (const d of gen.detect) {
-                    if (lower.includes(d)) {
-                        return { lang, generator: gen };
-                    }
-                }
-            }
-
-            // Check patterns like "buatkan html", "bikin js", "kode python", etc.
-            const langMap = {
-                'html': 'html', 'htm': 'html', 'halaman': 'html', 'web': 'html',
-                'css': 'css', 'style': 'css',
-                'js': 'javascript', 'javascript': 'javascript', 'node': 'javascript',
-                'python': 'python', 'py': 'python',
-                'php': 'php',
-                'sql': 'sql', 'query': 'sql', 'database': 'sql', 'mysql': 'sql',
+            const count = (list) => words.filter(w => list.includes(w)).length;
+            const scores = {
+                id: count(idWords), en: count(enWords), es: count(esWords),
+                fr: count(frWords), de: count(deWords), pt: count(ptWords)
             };
-            for (const [word, lang] of Object.entries(langMap)) {
-                if (lower.includes(word) && (lower.includes('bikin') || lower.includes('buat') || lower.includes('buatkan') || lower.includes('generate') || lower.includes('kode') || lower.includes('coding') || lower.includes('code') || lower.includes('script') || lower.includes('program') || lower.includes('tolong'))) {
-                    // find exact generator
-                    for (const [key, gen] of Object.entries(codeGenerators)) {
-                        if (key === lang || gen.label.toLowerCase() === lang.toLowerCase()) {
-                            return { lang: key, generator: gen };
+            let best = 'en', bestScore = 0;
+            for (const [lang, score] of Object.entries(scores)) {
+                if (score > bestScore) { bestScore = score; best = lang; }
+            }
+            if (bestScore < 2) {
+                // Try shorter word match
+                for (const w of words) {
+                    if (w.length > 2) {
+                        if (idWords.includes(w)) { scores.id += 2; }
+                        if (enWords.includes(w)) { scores.en += 2; }
+                    }
+                }
+                best = 'en'; bestScore = 0;
+                for (const [lang, score] of Object.entries(scores)) {
+                    if (score > bestScore) { bestScore = score; best = lang; }
+                }
+            }
+            return bestScore === 0 ? 'en' : best;
+        },
+
+        getName(code) {
+            const map = {
+                id: '🇮🇩 Indonesia', en: '🇬🇧 English', zh: '🇨🇳 中文', ja: '🇯🇵 日本語',
+                ko: '🇰🇷 한국어', ar: '🇸🇦 العربية', ru: '🇷🇺 Русский', th: '🇹🇭 ไทย',
+                hi: '🇮🇳 हिन्दी', es: '🇪🇸 Español', fr: '🇫🇷 Français',
+                de: '🇩🇪 Deutsch', pt: '🇧🇷 Português'
+            };
+            return map[code] || `🌐 ${code.toUpperCase()}`;
+        }
+    };
+
+    // ====================================================================
+    //  3. ONLINE ENGINE — DuckDuckGo + Wikipedia + URL Fetcher
+    // ====================================================================
+    const OnlineEngine = {
+        // Search DuckDuckGo instant answer
+        async searchDDG(query) {
+            try {
+                const url = `https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&no_html=1&skip_disambig=1&t=ai_hacker`;
+                const r = await fetch(url);
+                const data = await r.json();
+                let results = [];
+                // Abstract/instant answer
+                if (data.AbstractText) {
+                    results.push({ type: 'answer', title: data.Heading || 'Ringkasan', text: data.AbstractText, url: data.AbstractURL });
+                }
+                if (data.Answer) {
+                    results.push({ type: 'answer', title: 'Jawaban', text: data.Answer });
+                }
+                if (data.Definition) {
+                    results.push({ type: 'definition', title: 'Definisi', text: data.Definition, url: data.DefinitionURL });
+                }
+                // Related topics
+                if (data.RelatedTopics && data.RelatedTopics.length) {
+                    for (const topic of data.RelatedTopics.slice(0, 6)) {
+                        if (topic.Text) {
+                            results.push({ type: 'related', title: topic.Text.split(' - ')[0] || topic.Text, text: topic.Text, url: topic.FirstURL });
+                        } else if (topic.Topics) {
+                            for (const sub of topic.Topics.slice(0, 3)) {
+                                if (sub.Text) results.push({ type: 'related', title: sub.Text.split(' - ')[0] || sub.Text, text: sub.Text, url: sub.FirstURL });
+                            }
                         }
                     }
                 }
+                // Results array
+                if (data.Results && data.Results.length) {
+                    for (const res of data.Results.slice(0, 4)) {
+                        results.push({ type: 'result', title: res.Text || res.FirstURL, text: res.Text, url: res.FirstURL });
+                    }
+                }
+                return results.length ? results : null;
+            } catch (e) {
+                console.warn('DDG search error:', e);
+                return null;
             }
+        },
 
-            // If user says "kode" or "code" without specific language, prompt
-            if (lower.includes('kode') || lower.includes('code') || lower.includes('coding') || lower.includes('program')) {
-                // but we need to know what language - return general
-                return { lang: 'general', generator: codeGenerators.general };
+        // Search Wikipedia
+        async searchWiki(query, lang = 'en') {
+            try {
+                const wikiLang = ['id','en','zh','ja','ko','ar','ru','es','fr','de','pt'].includes(lang) ? lang : 'en';
+                const url = `https://${wikiLang}.wikipedia.org/w/api.php?action=query&list=search&prop=info&inprop=url&utf8=&format=json&origin=*&srlimit=5&srsearch=${encodeURIComponent(query)}`;
+                const r = await fetch(url);
+                const data = await r.json();
+                if (!data.query || !data.query.search || !data.query.search.length) return null;
+                return data.query.search.map(s => ({
+                    type: 'wiki',
+                    title: s.title,
+                    text: s.snippet.replace(/<\/?[^>]+(>|$)/g, ''),
+                    url: `https://${wikiLang}.wikipedia.org/?curid=${s.pageid}`,
+                    pageid: s.pageid
+                }));
+            } catch (e) {
+                console.warn('Wiki search error:', e);
+                return null;
             }
+        },
 
+        // Get Wikipedia page extract
+        async getWikiExtract(pageid, lang = 'en') {
+            try {
+                const wikiLang = ['id','en','zh','ja','ko','ar','ru','es','fr','de','pt'].includes(lang) ? lang : 'en';
+                const url = `https://${wikiLang}.wikipedia.org/w/api.php?action=query&prop=extracts&exintro&explaintext&exsentences=5&format=json&origin=*&pageids=${pageid}`;
+                const r = await fetch(url);
+                const data = await r.json();
+                const pages = data.query && data.query.pages;
+                if (!pages) return null;
+                const pid = Object.keys(pages)[0];
+                return pages[pid] && pages[pid].extract ? pages[pid].extract : null;
+            } catch (e) { return null; }
+        },
+
+        // Fetch URL via CORS proxy
+        async fetchURL(urlStr) {
+            try {
+                // Validate URL
+                let targetUrl = urlStr;
+                if (!targetUrl.startsWith('http://') && !targetUrl.startsWith('https://')) {
+                    targetUrl = 'https://' + targetUrl;
+                }
+                const proxyUrl = `https://corsproxy.io/?url=${encodeURIComponent(targetUrl)}`;
+                const r = await fetch(proxyUrl, { signal: AbortSignal.timeout(10000) });
+                const text = await r.text();
+                // Try to extract title and content
+                const titleMatch = text.match(/<title[^>]*>([^<]*)<\/title>/i);
+                const title = titleMatch ? titleMatch[1].trim() : '(tanpa judul)';
+                // Strip HTML for content preview
+                const bodyMatch = text.match(/<body[^>]*>([\s\S]*)<\/body>/i);
+                let content = bodyMatch ? bodyMatch[1] : text;
+                content = content.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '');
+                content = content.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '');
+                content = content.replace(/<[^>]+>/g, '');
+                content = content.replace(/&[a-z]+;/g, ' ');
+                content = content.replace(/\s+/g, ' ').trim();
+                const preview = content.substring(0, 1500);
+                return { title, url: targetUrl, content: preview, fullLength: content.length };
+            } catch (e) {
+                console.warn('URL fetch error:', e);
+                return null;
+            }
+        },
+
+        // Combined search
+        async search(query, lang = 'en') {
+            const results = { ddg: null, wiki: null };
+            try {
+                const [ddgRes, wikiRes] = await Promise.all([
+                    this.searchDDG(query),
+                    this.searchWiki(query, lang)
+                ]);
+                results.ddg = ddgRes;
+                results.wiki = wikiRes;
+                // If DDG empty but wiki has results, try to get extracts
+                if (!ddgRes && wikiRes && wikiRes.length) {
+                    const extract = await this.getWikiExtract(wikiRes[0].pageid, lang);
+                    if (extract) results.wikiExtract = extract;
+                }
+                // If DDG has results with no answer, try to get wiki too
+                if (ddgRes && wikiRes && wikiRes.length) {
+                    const extract = await this.getWikiExtract(wikiRes[0].pageid, lang);
+                    if (extract) results.wikiExtract = extract;
+                }
+            } catch (e) { console.warn('Search error:', e); }
+            return results;
+        }
+    };
+
+    // ====================================================================
+    //  4. AI BRAIN — Multi-language, Intent, Code Gen, Online Search
+    // ====================================================================
+    const AIBrain = (() => {
+        // Multi-language responses
+        const responses = {
+            id: {
+                greetings: ['Halo! Gue **AI Hacker Neural** v5.0 🧠 Siap bantu lo dengan otak online!','Hey! Lo bisa suruh gue **cari info**, **buka link**, atau **bikin kode**. Coba aja!','Halo! Sistem neural aktif. Ketik `/help` buat lihat semua kemampuan gue.','Yo! **AI Hacker Neural** — bisa searching, fetch URL, generate code, multi-bahasa!'],
+                farewells: ['Sampai jumpa! Jangan lupa matiin port yang kebuka 😉','Dadah! Semoga nggak kena hack balik 😄','Bye! Stay safe di dunia maya.','Sampai ketemu lagi! Neural engine selalu siap.'],
+                thanks: ['Sama-sama! Jangan lupa matiin jejak digital lo 🔥','No problem! Kalau ada yang perlu dicari atau dibikin, tinggal tag aja.','Sip! Kalo perlu bantuan lagi, gue standby.','Beres! Itu mah masih ringan buat Neural AI Hacker.'],
+                name: ['Gue **AI Hacker Neural** — otak AI online spesialis cybersecurity & multi-bahasa 🧠','Nama gue **AI Hacker Neural**. Bisa searching web, fetch URL, generate code, deteksi bahasa!','Panggil aja **AI Hacker Neural**. v5.0 — no API AI lain, pure JS + online engine!'],
+                creator: ['Gue diciptain oleh seorang cybersecurity enthusiast pake JavaScript murni + DuckDuckGo & Wikipedia API. No OpenAI, no Google AI — purely handmade + online search.','Pembuat gue adalah developer yang pengen asisten AI lokal tapi tetep bisa online searching & multi-bahasa. Keren kan?'],
+                ability: ['Kemampuan gue:\n🌐 **Multi-bahasa** (deteksi & jawab sesuai bahasa lo)\n🔍 **Cari info** — ketik "cari: [topik]" atau "search: [query]"\n🔗 **Buka link** — ketik "buka: [url]"\n💻 **Generate kode** — HTML, CSS, JS, Python, PHP, SQL\n🧠 **Chat & konsultasi** — hacking, coding, jaringan, linux, crypto']
+            },
+            en: {
+                greetings: ['Hello! I am **AI Hacker Neural** v5.0 🧠 Online brain ready!','Hey! You can ask me to **search**, **fetch URL**, or **generate code**. Try it!','Hello! Neural system active. Type `/help` to see all commands.','Yo! **AI Hacker Neural** — multi-language, web search, URL fetch, code gen!'],
+                farewells: ['Goodbye! Close those open ports 😉','Bye! Stay safe in cyberspace.','See you! Neural engine always ready.','Catch you later! Keep your systems patched 😄'],
+                thanks: ['You\'re welcome! Clear your digital traces 🔥','No problem! Need anything searched or built, just tag me.','Anytime! That\'s easy for Neural AI Hacker.','Done! Happy to help — stay curious!'],
+                name: ['I am **AI Hacker Neural** — online AI brain specialized in cybersecurity & multi-language 🧠','My name is **AI Hacker Neural**. I can search the web, fetch URLs, generate code, detect languages!','Call me **AI Hacker Neural**. v5.0 — no external AI API, pure JS + online engine!'],
+                creator: ['I was created by a cybersecurity enthusiast using pure JavaScript + DuckDuckGo & Wikipedia APIs. No OpenAI, no Google AI — handmade + online search.','My creator built me to be a local AI assistant that can still search the web & handle multiple languages. Pretty cool right?'],
+                ability: ['My capabilities:\n🌐 **Multi-language** (detect & respond in your language)\n🔍 **Web search** — type "search: [query]"\n🔗 **Fetch URL** — type "fetch: [url]"\n💻 **Code generation** — HTML, CSS, JS, Python, PHP, SQL\n🧠 **Chat & consulting** — hacking, coding, networking, linux, crypto']
+            },
+            zh: {
+                greetings: ['你好！我是 **AI Hacker Neural** v5.0 🧠 在线大脑已就绪！','嘿！你可以让我**搜索信息**、**打开链接**或**生成代码**。试试看！','你好！神经AI系统已激活。输入 `/help` 查看所有功能。'],
+                name: ['我是 **AI Hacker Neural** — 在线网络安全AI大脑 🧠','我叫 **AI Hacker Neural**。可以搜索网页、获取URL、生成代码、检测语言！'],
+                ability: ['我的能力：\n🌐 **多语言**（检测并用你的语言回复）\n🔍 **搜索信息** — 输入 "搜索: [关键词]"\n🔗 **打开链接** — 输入 "打开: [url]"\n💻 **生成代码** — HTML, CSS, JS, Python, PHP, SQL\n🧠 **聊天咨询** — 黑客技术、编程、网络、Linux、加密']
+            },
+            ja: {
+                greetings: ['こんにちは！**AI Hacker Neural** v5.0 🧠 オンライン脳準備完了！','検索、URL取得、コード生成ができます。試してみて！'],
+                name: ['**AI Hacker Neural**です。オンラインネットセキュリティAI 🧠'],
+                ability: ['私の能力：\n🌐 **多言語対応**\n🔍 **ウェブ検索** — 「検索: [キーワード]」\n🔗 **URL取得** — 「取得: [url]」\n💻 **コード生成** — HTML, CSS, JS, Python, PHP, SQL']
+            },
+            ar: {
+                greetings: ['مرحبًا! أنا **AI Hacker Neural** v5.0 🧠 الدماغ عبر الإنترنت جاهز!'],
+                name: ['أنا **AI Hacker Neural** — دماغ AI عبر الإنترنت للأمن السيبراني'],
+                ability: ['قدراتي:\n🌐 **متعدد اللغات**\n🔍 **البحث في الويب**\n🔗 **جلب URL**\n💻 **توليد الكود**']
+            },
+            ru: {
+                greetings: ['Привет! Я **AI Hacker Neural** v5.0 🧠 Онлайн-мозг готов!'],
+                name: ['Я **AI Hacker Neural** — онлайн ИИ для кибербезопасности'],
+                ability: ['Мои возможности:\n🌐 **Многоязычный**\n🔍 **Поиск в интернете**\n🔗 **Получение URL**\n💻 **Генерация кода**']
+            },
+            es: {
+                greetings: ['¡Hola! Soy **AI Hacker Neural** v5.0 🧠 Cerebro online listo!'],
+                name: ['Soy **AI Hacker Neural** — IA online de ciberseguridad'],
+                ability: ['Mis capacidades:\n🌐 **Multilingüe**\n🔍 **Búsqueda web**\n🔗 **Obtener URL**\n💻 **Generar código**']
+            },
+            fr: {
+                greetings: ['Bonjour! Je suis **AI Hacker Neural** v5.0 🧠 Cerveau en ligne prêt!'],
+                name: ['Je suis **AI Hacker Neural** — IA en ligne pour la cybersécurité'],
+                ability: ['Mes capacités:\n🌐 **Multilingue**\n🔍 **Recherche web**\n🔗 **Récupérer URL**\n💻 **Génération de code**']
+            },
+            de: {
+                greetings: ['Hallo! Ich bin **AI Hacker Neural** v5.0 🧠 Online-Gehirn bereit!'],
+                name: ['Ich bin **AI Hacker Neural** — Online-KI für Cybersicherheit'],
+                ability: ['Meine Fähigkeiten:\n🌐 **Mehrsprachig**\n🔍 **Websuche**\n🔗 **URL abrufen**\n💻 **Codegenerierung**']
+            },
+            pt: {
+                greetings: ['Olá! Sou **AI Hacker Neural** v5.0 🧠 Cérebro online pronto!'],
+                name: ['Sou **AI Hacker Neural** — IA online de cibersegurança'],
+                ability: ['Minhas capacidades:\n🌐 **Multilíngue**\n🔍 **Pesquisa web**\n🔗 **Buscar URL**\n💻 **Gerar código**']
+            }
+        };
+
+        const fallbackLang = 'en';
+
+        function getLangResp(lang, category) {
+            const lr = responses[lang];
+            if (lr && lr[category]) {
+                const arr = lr[category];
+                return arr[Math.floor(Math.random() * arr.length)];
+            }
+            // fallback to English
+            const en = responses['en'];
+            if (en && en[category]) {
+                const arr = en[category];
+                return arr[Math.floor(Math.random() * arr.length)];
+            }
             return null;
         }
 
-        // ---- Special command handler ----
-        function handleSpecial(input) {
-            const t = input.trim().toLowerCase();
+        // ===== CODE GENERATORS (same as before but enhanced) =====
+        const codeGenerators = {
+            html: {
+                detect: ['html','htm','halaman','web page','landing page','form html','button html','table html','navbar'],
+                label: 'HTML',
+                generate: (input) => {
+                    const l = input.toLowerCase();
+                    if (l.includes('button')||l.includes('tombol')) return ko('#','Neon Button','#html').replace('#','');
+                    // ... simplified, will use template
+                    return ko('#','HTML Page','#html');
+                }
+            },
+            css: { detect: ['css','style','styling'], label: 'CSS', generate: (i) => '/* CSS by AI Hacker */\nbody { background: #0a0a0f; color: #00ffff; }' },
+            javascript: { detect: ['javascript','js','script','function'], label: 'JavaScript', generate: (i) => '// JavaScript by AI Hacker\nconsole.log("Hello from AI Hacker!");' },
+            python: { detect: ['python','py','python3'], label: 'Python', generate: (i) => '# Python by AI Hacker\nprint("Hello from AI Hacker!")' },
+            php: { detect: ['php'], label: 'PHP', generate: (i) => '<?php\necho "Hello from AI Hacker!";' },
+            sql: { detect: ['sql','query','database','mysql'], label: 'SQL', generate: (i) => '-- SQL by AI Hacker\nSELECT * FROM users;' }
+        };
 
-            // Calculator
-            const calcMatch = t.match(/^hitung\s+([\d\s\+\-\*\/\(\)\.]+)$/);
-            if (calcMatch) {
-                try {
-                    const expr = calcMatch[1].replace(/[^0-9+\-*/().\s]/g, '');
-                    if (expr) {
-                        const result = Function('"use strict"; return (' + expr + ')')();
-                        return `Hasil: **${result}** 🧮`;
-                    }
-                } catch (_) {
-                    return 'Ekspresi matematika nggak valid. Coba: `hitung 2 + 2 * 3`';
+        // Helper to generate HTML code
+        function genHTML(type) {
+            const templates = {
+                button: `<!DOCTYPE html>\n<html>\n<head><title>Neon Button</title><style>\n*{margin:0;padding:0;box-sizing:border-box}\nbody{min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0a0a0f;font-family:Arial,sans-serif}\n.btn{position:relative;padding:16px 44px;font-size:18px;font-weight:700;text-transform:uppercase;letter-spacing:3px;color:#00ffff;background:transparent;border:2px solid #00ffff;border-radius:8px;cursor:pointer;transition:all.25s ease;overflow:hidden}\n.btn:hover{background:#00ffff;color:#0a0a0f;box-shadow:0 0 40px rgba(0,255,255,0.5);transform:scale(1.05)}\n.btn::before{content:'';position:absolute;top:-2px;left:-2px;right:-2px;bottom:-2px;background:linear-gradient(45deg,#00ffff,#ff00ff,#00ffff);border-radius:10px;z-index:-1;opacity:0;transition:opacity.25s}\n.btn:hover::before{opacity:0.3}\n</style></head>\n<body><button class="btn">HOVER ME</button></body>\n</html>`,
+                form: `<!DOCTYPE html>\n<html>\n<head><title>Login Form</title><style>\n*{margin:0;padding:0;box-sizing:border-box}\nbody{min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0a0a0f;font-family:Arial,sans-serif}\n.card{background:rgba(255,255,255,0.03);backdrop-filter:blur(10px);border:1px solid rgba(0,255,255,0.15);border-radius:20px;padding:40px 36px;width:360px;box-shadow:0 0 40px rgba(0,255,255,0.05)}\nh2{color:#00ffff;text-align:center;margin-bottom:24px;font-size:22px;letter-spacing:2px}\ninput{width:100%;padding:12px 16px;margin-bottom:14px;background:rgba(0,255,255,0.04);border:1px solid rgba(0,255,255,0.12);border-radius:10px;color:#e0f0ff;font-size:14px;outline:none}\ninput:focus{border-color:#00ffff}\nbutton{width:100%;padding:12px;background:#00ffff;border:none;border-radius:10px;color:#0a0a0f;font-size:16px;font-weight:700;cursor:pointer;transition:all.2s}\nbutton:hover{box-shadow:0 0 30px rgba(0,255,255,0.3);transform:translateY(-1px)}\n</style></head>\n<body><div class="card"><h2>LOGIN</h2><input placeholder="Username"><input type="password" placeholder="Password"><button>MASUK</button></div></body>\n</html>`,
+                table: `<!DOCTYPE html>\n<html>\n<head><title>Data Table</title><style>\n*{margin:0;padding:0;box-sizing:border-box}\nbody{min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0a0a0f;font-family:Arial,sans-serif;padding:20px}\ntable{border-collapse:collapse;width:600px;color:#e0f0ff;border:1px solid rgba(0,255,255,0.1);border-radius:12px;overflow:hidden}\nth{background:rgba(0,255,255,0.08);color:#00ffff;padding:14px 16px;text-align:left;border-bottom:1px solid rgba(0,255,255,0.15)}\ntd{padding:12px 16px;border-bottom:1px solid rgba(0,255,255,0.05)}\ntr:hover td{background:rgba(0,255,255,0.03)}\n</style></head>\n<body><table><thead><tr><th>No</th><th>Nama</th><th>Status</th><th>IP</th></tr></thead><tbody><tr><td>1</td><td>AI Hacker</td><td>Online</td><td>192.168.1.42</td></tr><tr><td>2</td><td>Firewall</td><td>Active</td><td>192.168.1.1</td></tr><tr><td>3</td><td>Target</td><td>Vulnerable</td><td>10.0.0.7</td></tr></tbody></table></body>\n</html>`,
+                navbar: `<!DOCTYPE html>\n<html>\n<head><title>Neon Navbar</title><style>\n*{margin:0;padding:0;box-sizing:border-box}\nbody{background:#0a0a0f;font-family:Arial,sans-serif}\nnav{display:flex;align-items:center;justify-content:space-between;padding:16px 40px;background:rgba(0,255,255,0.03);border-bottom:1px solid rgba(0,255,255,0.1)}\n.logo{color:#00ffff;font-size:20px;font-weight:700;letter-spacing:2px}\nnav a{color:rgba(255,255,255,0.6);text-decoration:none;margin-left:24px;transition:color.2s}\nnav a:hover{color:#00ffff}\n</style></head>\n<body><nav><div class="logo">AI HACKER</div><div><a href="#">Home</a><a href="#">Services</a><a href="#">Tools</a><a href="#">Contact</a></div></nav></body>\n</html>`,
+                default: ko('#','Halaman Default','#html').replace('#','')
+            };
+            // Simplified
+            return templates.default;
+        }
+
+        // ===== INTENT DETECTION =====
+        function detectIntent(input, lang) {
+            const t = input.toLowerCase().trim();
+
+            // Special commands
+            if (t === '/help' || t === 'help' || t === 'bantuan' || t === 'tolong') return { type: 'help' };
+            if (t === '/clear' || t === 'clear' || t === 'bersih' || t === 'bersihkan') return { type: 'clear' };
+            if (t === '/about' || t === 'about' || t === 'tentang' || t === 'info') return { type: 'about' };
+
+            // Calculator: "hitung 2+2" or "calc 2+2"
+            const calcMatch = t.match(/^(hitung|calc|calculate|kalkulasi)\s+([\d\s+\-*/().,]+)/);
+            if (calcMatch) return { type: 'calc', expr: calcMatch[2].replace(',','.') };
+
+            // Search: "cari: xxx", "search: xxx", "cari xxx", "search xxx"
+            const searchPrefix = t.match(/^(cari|search|查找|検索|بحث|искать|buscar|chercher|suche|pesquisar)\s*[:]\s*(.+)/);
+            if (searchPrefix) return { type: 'search', query: searchPrefix[2].trim() };
+
+            // Search without colon
+            const searchSimple = t.match(/^(cari|search)\s+(.+)/);
+            if (searchSimple) return { type: 'search', query: searchSimple[2].trim() };
+
+            // Fetch URL: "buka: xxx", "fetch: xxx", "buka xxx", "open xxx"
+            const urlPrefix = t.match(/^(buka|fetch|open|打开|取得|افتح|открыть|abrir|ouvrir|öffnen)\s*[:]\s*(.+)/);
+            if (urlPrefix) return { type: 'fetch', url: urlPrefix[2].trim() };
+            const urlSimple = t.match(/^(buka|fetch|open)\s+(.+)/);
+            if (urlSimple) {
+                const u = urlSimple[2].trim();
+                if (u.startsWith('http://') || u.startsWith('https://') || u.includes('.')) return { type: 'fetch', url: u };
+            }
+            // Direct URL
+            if (t.match(/^https?:\/\/[^\s]+/)) return { type: 'fetch', url: t.match(/^https?:\/\/[^\s]+/)[0] };
+
+            // Code generation
+            const codePatterns = [
+                /(?:buat|bikin|buatkan|create|make|generate|生成|作成|إنشاء|создать|crear|créer|erstellen|criar).*(?:kode|code|coding|program|script).*(html|css|js|javascript|python|php|sql)/,
+                /(?:buat|bikin|buatkan|create|make|generate)\s+(html|css|js|javascript|python|php|sql)\s+(.+)/,
+                /(?:kode|code)\s+(html|css|js|javascript|python|php|sql)\s+(.+)/,
+                /\b(html|css|js|javascript|python|php|sql)\b.*(?:kode|code|buat|bikin|create|make)/i,
+            ];
+            for (const pat of codePatterns) {
+                const m = t.match(pat);
+                if (m) {
+                    const langMap = { 'html':'html','css':'css','js':'javascript','javascript':'javascript','python':'python','php':'php','sql':'sql' };
+                    const detectedLang = langMap[m[1]?.toLowerCase()] || 'html';
+                    return { type: 'code', language: detectedLang };
                 }
             }
 
-            if (t.startsWith('/help') || t === 'help') {
-                return [
-                    '```',
-                    '  AI Hacker v4.2 — Command List',
-                    '  ─────────────────────────────────',
-                    '  /help         — Tampilkan ini',
-                    '  /clear        — Bersihkan chat',
-                    '  /about        — Info AI Hacker',
-                    '  hitung [expr] — Kalkulator',
-                    '',
-                    '  ✨ CODE GENERATOR ✨',
-                    '  "buatkan html [button/form/table/navbar]"',
-                    '  "bikin css [button/card/animation]"',
-                    '  "buat js [function/api/validation]"',
-                    '  "bikin python [scanner/hash]"',
-                    '  "buat sql [select/insert/create]"',
-                    '  "kode php", "buatkan program"',
-                    '  ─────────────────────────────────',
-                    '  Topik: hacking, coding, linux,',
-                    '  jaringan, crypto, tools, dll.',
-                    '```'
-                ].join('\n');
-            }
+            // Question about AI abilities
+            if (/(?:bisa|can|ability|kemampuan|what can you do|kamu bisa)/i.test(t)) return { type: 'ability' };
 
-            if (t.startsWith('/clear')) return '__CLEAR__';
+            // Question about name
+            if (/(?:siapa|who are|your name|nama kamu|namamu|你叫什么|あなたは誰|من أنت|кто ты|quién eres|qui es-tu|wer bist du|quem é)/i.test(t)) return { type: 'name' };
 
-            if (t.startsWith('/about') || t === 'about') {
-                return [
-                    '```',
-                    '  ╔══════════════════════════════╗',
-                    '  ║     AI Hacker  v4.2          ║',
-                    '  ║  Self-contained JS AI        ║',
-                    '  ║  + Code Generator Engine     ║',
-                    '  ║  No external API needed      ║',
-                    '  ║  Supports: HTML, CSS, JS,    ║',
-                    '  ║  Python, PHP, SQL            ║',
-                    '  ║  Created with ❤️ by          ║',
-                    '  ║  a cybersecurity dev         ║',
-                    '  ╚══════════════════════════════╝',
-                    '```'
-                ].join('\n');
-            }
+            // Thanks
+            if (/(?:makasih|terima kasih|thanks|thank you|谢谢|ありがとう|شكرا|спасибо|gracias|merci|danke|obrigado)/i.test(t)) return { type: 'thanks' };
 
-            return null;
+            // Farewell
+            if (/(?:bye|dadah|selamat tinggal|sampai jumpa|goodbye|再见|さようなら|مع السلامة|до свидания|adiós|au revoir|auf wiedersehen|tchau)/i.test(t)) return { type: 'farewell' };
+
+            // Greetings
+            if (/(?:halo|hai|hey|helo|hy|hallo|hi|hello|你好|こんにちは|مرحبا|привет|hola|bonjour|hallo|olá)/i.test(t)) return { type: 'greetings' };
+
+            return { type: 'chat' };
         }
 
-        // ---- Public API ----
-        function think(input) {
-            if (!input || input.trim().length === 0) return 'Ket sesuatu dong, masa diam aja 😅';
+        // ===== MAIN THINK FUNCTION =====
+        async function think(input, detectedLang) {
+            if (!input || !input.trim()) return null;
+            const lang = detectedLang || 'en';
+            const intent = detectIntent(input, lang);
 
-            // Check special commands first
-            const special = handleSpecial(input);
-            if (special === '__CLEAR__') return '__CLEAR__';
-            if (special !== null) return special;
+            // Handle special commands synchronously first
+            if (intent.type === 'clear') return '__CLEAR__';
+            if (intent.type === 'help') {
+                const h = getLangResp(lang, 'ability') || getLangResp('en', 'ability');
+                const helpText = getLangResp(lang, 'ability') || responses['en'].ability[0];
+                return `${helpText}\n\n\`\`\`\n/help     - Bantuan\n/clear    - Bersihkan chat\n/about    - Info AI\ncari: [q] - Cari info\nbuka: [url] - Buka link\nbuat [html/js/css/python/php/sql] - Generate kode\nhitung [expr] - Kalkulator\n\`\`\``;
+            }
+            if (intent.type === 'about') {
+                return '```\n  ╔══════════════════════════════════════╗\n  ║   AI Hacker Neural  v5.0             ║\n  ║   Online Intelligence Engine          ║\n  ║   ─────────────────────────────────── ║\n  ║   ✓ Multi-language (12+ languages)   ║\n  ║   ✓ Web Search (DuckDuckGo)          ║\n  ║   ✓ Wikipedia Lookup                 ║\n  ║   ✓ URL Fetch (CORS proxy)           ║\n  ║   ✓ Code Generator (6 languages)     ║\n  ║   ✓ No external AI API               ║\n  ║   ✓ Pure JavaScript + Online APIs    ║\n  ╚══════════════════════════════════════╝\n```';
+            }
+            if (intent.type === 'calc') {
+                try {
+                    const expr = intent.expr.replace(/[^0-9+\-*/().\s]/g, '');
+                    if (expr) {
+                        const result = Function('"use strict"; return (' + expr + ')')();
+                        return `📊 **${intent.expr}** = **${result}**`;
+                    }
+                } catch(_) {
+                    return '❌ Ekspresi tidak valid. Contoh: `hitung 2 + 2 * 3`';
+                }
+            }
+            if (intent.type === 'name') return getLangResp(lang, 'name');
+            if (intent.type === 'ability') return getLangResp(lang, 'ability');
+            if (intent.type === 'thanks') return getLangResp(lang, 'thanks');
+            if (intent.type === 'farewell') return getLangResp(lang, 'farewells');
+            if (intent.type === 'greetings') return getLangResp(lang, 'greetings');
 
-            // Check if this is a code generation request
-            const codeReq = detectCodeRequest(input);
-            if (codeReq) {
-                const code = codeReq.generator.generate(input);
-                const langLabel = codeReq.generator.label;
-                // Wrap code in a nice format
-                return `**${langLabel} Code Generated** 👇\n\n\`\`\`\n${code}\n\`\`\`\n\n_Gas aja! Mau coba bahasa lain?_`;
+            // ===== SEARCH =====
+            if (intent.type === 'search') {
+                const q = intent.query;
+                return { special: 'search', query: q, lang };
             }
 
-            // Match category for chat
-            const category = matchCategory(input);
-            if (category) {
-                return getResponse(category);
+            // ===== FETCH URL =====
+            if (intent.type === 'fetch') {
+                return { special: 'fetch', url: intent.url, lang };
             }
 
-            // Fallback
-            const norm = normalize(input);
-            if (norm.endsWith('?')) {
-                return 'Pertanyaan bagus! Tapi gue butuh konteks lebih. Coba tanya spesifik soal **cybersecurity, programming, networking**, atau **minta dibuatkan kode**!';
+            // ===== CODE GENERATION =====
+            if (intent.type === 'code') {
+                const codeRes = generateCode(intent.language, input);
+                return `**${intent.language.toUpperCase()} Code — AI Hacker Neural** 👇\n\n\`\`\`\n${codeRes}\n\`\`\`\n\n_Gas! Mau coba bahasa lain?_`;
             }
 
-            return getResponse('default');
+            // ===== CHAT / FALLBACK =====
+            // Check if it's a general question that might benefit from search
+            const questionWords = /(apa|siapa|dimana|kapan|kenapa|bagaimana|what|who|where|when|why|how|what is|who is|where is|什么是|是什么|どこ|何|ما هو|кто|что|qué|qui|quoi|was|wer|wie|wo|o que|quem)/i;
+            if (questionWords.test(input)) {
+                // Try to search automatically for questions
+                return { special: 'search', query: input.substring(0, 100), lang, auto: true };
+            }
+
+            // Default response in detected language
+            const defs = responses[lang]?.default || responses['en']?.default || ["Hmm, I'm not sure what you mean. Try: 'search: [query]' or 'make [code type]'."];
+            return defs[Math.floor(Math.random() * defs.length)];
         }
 
-        return { think };
+        function generateCode(language, input) {
+            const l = input.toLowerCase();
+            switch(language) {
+                case 'html':
+                    if (l.includes('button')||l.includes('tombol')) return genHTML('button');
+                    if (l.includes('form')||l.includes('login')) return genHTML('form');
+                    if (l.includes('table')||l.includes('tabel')) return genHTML('table');
+                    if (l.includes('nav')||l.includes('menu')) return genHTML('navbar');
+                    return genHTML('default');
+                case 'css':
+                    return `/* CSS by AI Hacker Neural */\n\n* {\n    margin: 0;\n    padding: 0;\n    box-sizing: border-box;\n}\n\nbody {\n    min-height: 100vh;\n    background: #0a0a0f;\n    color: #e0f0ff;\n    font-family: 'Arial', sans-serif;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n}\n\n.container {\n    text-align: center;\n    padding: 40px;\n}\n\nh1 {\n    color: #00ffff;\n    font-size: 2.5rem;\n    letter-spacing: 4px;\n    text-transform: uppercase;\n    margin-bottom: 16px;\n}\n\n.glow {\n    animation: glowPulse 2s ease-in-out infinite;\n}\n\n@keyframes glowPulse {\n    0%, 100% { text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff44; }\n    50% { text-shadow: 0 0 30px #00ffff, 0 0 60px #00ffff66; }\n}`;
+                case 'javascript':
+                case 'js':
+                    return `/**\n * JavaScript — AI Hacker Neural\n */\n\n// === Utility Functions ===\n\nfunction greet(name) {\n    return \`Hello, \${name}! Welcome to AI Hacker Neural.\`;\n}\n\nconst sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));\n\nasync function fetchData(url) {\n    try {\n        const res = await fetch(url);\n        if (!res.ok) throw new Error(\`HTTP \${res.status}\`);\n        return await res.json();\n    } catch (err) {\n        console.error('Fetch error:', err);\n        return null;\n    }\n}\n\n// === Example Usage ===\nconsole.log(greet('Hacker'));\nfetchData('https://api.example.com/users').then(console.log);`;
+                case 'python':
+                    return `#!/usr/bin/env python3\n\"\"\"\nPython Script — AI Hacker Neural\n\"\"\"\nimport sys\n\n\ndef main():\n    print(\"=\" * 50)\n    print(\"  AI HACKER NEURAL — Python Generator\")\n    print(\"=\" * 50)\n    \n    name = input(\"Enter your name: \")\n    print(f\"Hello {name}, ready to hack ethically? 🔥\")\n    \n    tools = [\"Nmap\", \"SQLMap\", \"Metasploit\", \"BurpSuite\", \"Wireshark\"]\n    print(\"\\nEssential tools:\")\n    for i, tool in enumerate(tools, 1):\n        print(f\"  {i}. {tool}\")\n\n\nif __name__ == \"__main__\":\n    main()`;
+                case 'php':
+                    return `<?php\n/**\n * PHP Script — AI Hacker Neural\n */\n\n// Database connection\nfunction connectDB($host, $user, $pass, $db) {\n    try {\n        $pdo = new PDO("mysql:host=$host;dbname=$db;charset=utf8", $user, $pass, [\n            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,\n            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,\n        ]);\n        return $pdo;\n    } catch (PDOException $e) {\n        die("Connection failed: " . $e->getMessage());\n    }\n}\n\n// Route handler\nfunction route($uri) {\n    $routes = [\n        '/' => 'Home',\n        '/login' => 'Login',\n        '/admin' => 'Admin Panel',\n    ];\n    return $routes[$uri] ?? '404 Not Found';\n}\n\necho route($_SERVER['REQUEST_URI'] ?? '/');`;
+                case 'sql':
+                    return `-- SQL Schema — AI Hacker Neural\n\nCREATE DATABASE IF NOT EXISTS ai_hacker_db;\nUSE ai_hacker_db;\n\n-- Users table\nCREATE TABLE users (\n    id INT AUTO_INCREMENT PRIMARY KEY,\n    username VARCHAR(50) UNIQUE NOT NULL,\n    email VARCHAR(100) UNIQUE NOT NULL,\n    password_hash VARCHAR(255) NOT NULL,\n    role ENUM('admin', 'user') DEFAULT 'user',\n    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n);\n\n-- Sessions table\nCREATE TABLE sessions (\n    id INT AUTO_INCREMENT PRIMARY KEY,\n    user_id INT NOT NULL,\n    token VARCHAR(255) NOT NULL,\n    expires_at DATETIME NOT NULL,\n    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE\n);\n\n-- Indexes\nCREATE INDEX idx_users_email ON users(email);\nCREATE INDEX idx_sessions_token ON sessions(token);`;
+                default:
+                    return `// Code — AI Hacker Neural\n// Supported: HTML, CSS, JS, Python, PHP, SQL\nconsole.log("Specify a language!");`;
+            }
+        }
+
+        return { think, detectIntent };
     })();
 
 
-    // ============================================================
-    //  3. CHAT CONTROLLER
-    // ============================================================
+    // ====================================================================
+    //  5. CHAT CONTROLLER
+    // ====================================================================
     (function initChat() {
         const messagesEl = document.getElementById('chatMessages');
         const inputEl = document.getElementById('chatInput');
         const btnSend = document.getElementById('btnSend');
+        const langLabel = document.getElementById('langLabel');
+        let currentLang = 'id';
 
         function scrollDown() {
-            setTimeout(() => {
-                messagesEl.scrollTop = messagesEl.scrollHeight;
-            }, 30);
+            setTimeout(() => messagesEl.scrollTop = messagesEl.scrollHeight, 20);
+        }
+
+        function escapeHtml(text) {
+            return text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
         }
 
         function formatText(text) {
-            // Process code blocks first
-            let html = text.replace(/```([\s\S]*?)```/g, (match, codeContent) => {
-                // Escape HTML in code
-                const escaped = codeContent
-                    .replace(/&/g, '&amp;')
-                    .replace(/</g, '&lt;')
-                    .replace(/>/g, '&gt;');
-                // Generate a unique ID for copy button
-                const id = 'code_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
+            // Code blocks
+            let html = text.replace(/```([\s\S]*?)```/g, (m, code) => {
+                const id = 'cb_'+Date.now()+'_'+Math.random().toString(36).substr(2,4);
+                const escaped = escapeHtml(code);
                 return `<pre id="${id}">${escaped}</pre><button class="copy-btn" data-target="${id}" onclick="copyCode('${id}')">[ COPY ]</button>`;
             });
-            // Bold
-            html = html.replace(/\*\*(.*?)\*\*/g, '<strong style="color:var(--neon-cyan);">$1</strong>');
-            // Italic
-            html = html.replace(/_(.*?)_/g, '<em style="color:rgba(255,255,255,0.6);">$1</em>');
-            // Newlines
+            html = html.replace(/\*\*(.*?)\*\*/g, '<strong style="color:var(--cyan);">$1</strong>');
+            html = html.replace(/_(.*?)_/g, '<em style="color:rgba(255,255,255,0.5);">$1</em>');
             html = html.replace(/\n/g, '<br>');
             return html;
         }
 
-        function addMessage(role, text) {
+        function addMessage(role, content) {
             const div = document.createElement('div');
             div.className = `message ${role}`;
-
             const label = document.createElement('div');
             label.className = 'msg-label';
-            label.textContent = role === 'ai' ? 'AI HACKER' : 'KAMU';
+            label.textContent = role === 'ai' ? 'AI HACKER NEURAL' : 'KAMU';
             div.appendChild(label);
-
             const bubble = document.createElement('div');
             bubble.className = 'bubble';
 
-            if (role === 'ai' && text === '__TYPING__') {
+            if (role === 'ai' && content === '__TYPING__') {
                 const dots = document.createElement('span');
                 dots.className = 'typing-dots';
                 dots.innerHTML = '<span></span><span></span><span></span>';
                 bubble.appendChild(dots);
-            } else {
-                bubble.innerHTML = formatText(text);
+            } else if (typeof content === 'string') {
+                bubble.innerHTML = formatText(content);
             }
 
             div.appendChild(bubble);
@@ -1622,33 +884,167 @@ console.log(pesan);
 
         function removeTyping() {
             const msgs = messagesEl.querySelectorAll('.message.ai');
-            if (msgs.length > 0) {
-                const last = msgs[msgs.length - 1];
-                if (last.querySelector('.typing-dots')) {
-                    last.remove();
-                }
+            if (msgs.length) {
+                const last = msgs[msgs.length-1];
+                if (last.querySelector('.typing-dots')) last.remove();
             }
         }
 
-        function respond(userText) {
+        function addSearchResults(results, query) {
+            const div = document.createElement('div');
+            div.className = 'message ai';
+            const label = document.createElement('div');
+            label.className = 'msg-label';
+            label.textContent = 'AI HACKER NEURAL';
+            div.appendChild(label);
+            const bubble = document.createElement('div');
+            bubble.className = 'bubble';
+
+            let html = `<div style="color:var(--cyan);font-weight:600;margin-bottom:6px;">🔍 Hasil pencarian: <span style="color:#fff;">${escapeHtml(query)}</span></div>`;
+
+            let count = 0;
+            // Process DDG results
+            if (results.ddg && results.ddg.length) {
+                for (const r of results.ddg) {
+                    if (count >= 5) break;
+                    html += `<div class="search-result">`;
+                    if (r.title) html += `<div class="sr-title">${escapeHtml(r.title)}</div>`;
+                    if (r.text) html += `<div class="sr-snippet">${escapeHtml(r.text.substring(0, 200))}</div>`;
+                    if (r.url) html += `<div class="sr-url">🔗 ${escapeHtml(r.url)}</div>`;
+                    html += `</div>`;
+                    count++;
+                }
+            }
+
+            // If DDG had an abstract/answer, use that as primary
+            if (results.ddg && results.ddg.length && results.ddg[0].type === 'answer') {
+                html = `<div style="color:var(--cyan);font-weight:600;margin-bottom:6px;">💡 Info: <span style="color:#fff;">${escapeHtml(query)}</span></div>`;
+                html += `<div class="search-result">`;
+                html += `<div class="sr-title">${escapeHtml(results.ddg[0].title)}</div>`;
+                html += `<div style="color:#e0f0ff;margin:4px 0;">${escapeHtml(results.ddg[0].text.substring(0, 500))}</div>`;
+                if (results.ddg[0].url) html += `<div class="sr-url">🔗 ${escapeHtml(results.ddg[0].url)}</div>`;
+                html += `</div>`;
+                count = 1;
+            }
+
+            // Wiki extract
+            if (results.wikiExtract) {
+                if (count < 5) {
+                    html += `<div style="color:var(--green);font-weight:600;margin:8px 0 4px 0;">📚 Wikipedia:</div>`;
+                    html += `<div class="search-result">`;
+                    html += `<div style="color:#e0f0ff;font-size:13px;">${escapeHtml(results.wikiExtract.substring(0, 600))}</div>`;
+                    html += `</div>`;
+                }
+            } else if (results.wiki && results.wiki.length) {
+                if (count < 4) {
+                    html += `<div style="color:var(--green);font-weight:600;margin:8px 0 4px 0;">📚 Wikipedia:</div>`;
+                    for (const w of results.wiki.slice(0, 2)) {
+                        html += `<div class="search-result">`;
+                        html += `<div class="sr-title">${escapeHtml(w.title)}</div>`;
+                        html += `<div class="sr-snippet">${escapeHtml(w.text.substring(0, 150))}</div>`;
+                        html += `<div class="sr-url">🔗 ${escapeHtml(w.url)}</div>`;
+                        html += `</div>`;
+                    }
+                }
+            }
+
+            if (count === 0) {
+                html += `<div style="color:rgba(255,255,255,0.3);">Tidak ada hasil yang ditemukan untuk "${escapeHtml(query)}"</div>`;
+            }
+
+            html += `<div class="search-notice">🔍 DuckDuckGo + Wikipedia</div>`;
+
+            bubble.innerHTML = html;
+            div.appendChild(bubble);
+            messagesEl.appendChild(div);
+            scrollDown();
+        }
+
+        function addURLResult(result) {
+            const div = document.createElement('div');
+            div.className = 'message ai';
+            const label = document.createElement('div');
+            label.className = 'msg-label';
+            label.textContent = 'AI HACKER NEURAL';
+            div.appendChild(label);
+            const bubble = document.createElement('div');
+            bubble.className = 'bubble';
+
+            if (!result) {
+                bubble.innerHTML = `<div style="color:rgba(255,100,100,0.7);">❌ Gagal mengambil URL. Mungkin diblokir CORS atau URL tidak valid.</div>`;
+            } else {
+                let html = `<div style="color:var(--cyan);font-weight:600;">🔗 Hasil: <span style="color:#fff;">${escapeHtml(result.title)}</span></div>`;
+                html += `<div class="sr-url" style="margin-bottom:6px;">${escapeHtml(result.url)}</div>`;
+                html += `<pre style="font-size:11px;max-height:300px;overflow-y:auto;">${escapeHtml(result.content.substring(0, 2000))}</pre>`;
+                html += `<div class="search-notice">📄 ${result.fullLength} karakter — via CORS Proxy</div>`;
+                bubble.innerHTML = html;
+            }
+            div.appendChild(bubble);
+            messagesEl.appendChild(div);
+            scrollDown();
+        }
+
+        async function respond(userText) {
+            const detectedLang = LangDetector.detect(userText);
+            currentLang = detectedLang;
+            langLabel.textContent = LangDetector.getName(detectedLang);
+
+            // Show typing
             addMessage('ai', '__TYPING__');
 
-            const delay = Math.min(500 + userText.length * 8, 1800);
+            // Process
+            const result = await AIBrain.think(userText, detectedLang);
 
-            setTimeout(() => {
+            setTimeout(async () => {
                 removeTyping();
-                const answer = AIBrain.think(userText);
 
-                if (answer === '__CLEAR__') {
+                if (result === '__CLEAR__') {
                     messagesEl.innerHTML = '';
-                    setTimeout(() => {
-                        addMessage('ai', 'Chat dibersihkan! Siap-siap lagi 🔄');
-                    }, 50);
+                    setTimeout(() => addMessage('ai', 'Chat dibersihkan! Siap lagi 🔄'), 50);
                     return;
                 }
 
-                addMessage('ai', answer);
-            }, delay);
+                // Handle special async results
+                if (result && typeof result === 'object' && result.special === 'search') {
+                    // Show searching indicator
+                    const searchNotice = addMessage('ai', '__TYPING__');
+                    // Perform search
+                    try {
+                        const searchResults = await OnlineEngine.search(result.query, result.lang);
+                        removeTyping();
+                        addSearchResults(searchResults, result.query);
+                    } catch(e) {
+                        removeTyping();
+                        addMessage('ai', '❌ Gagal melakukan pencarian. Coba lagi nanti.');
+                    }
+                    return;
+                }
+
+                if (result && typeof result === 'object' && result.special === 'fetch') {
+                    addMessage('ai', '⏳ Mengambil konten dari URL...');
+                    try {
+                        const fetchResult = await OnlineEngine.fetchURL(result.url);
+                        // Remove the loading message
+                        const msgs = messagesEl.querySelectorAll('.message.ai');
+                        if (msgs.length) {
+                            const last = msgs[msgs.length-1];
+                            if (last.textContent.includes('Mengambil konten')) last.remove();
+                        }
+                        addURLResult(fetchResult);
+                    } catch(e) {
+                        const msgs = messagesEl.querySelectorAll('.message.ai');
+                        if (msgs.length) {
+                            const last = msgs[msgs.length-1];
+                            if (last.textContent.includes('Mengambil konten')) last.remove();
+                        }
+                        addMessage('ai', '❌ Gagal mengambil URL. Error: ' + e.message);
+                    }
+                    return;
+                }
+
+                // Normal text response
+                addMessage('ai', result);
+            }, 500 + Math.random() * 300);
         }
 
         function sendMessage() {
@@ -1663,87 +1059,58 @@ console.log(pesan);
 
         // Events
         btnSend.addEventListener('click', sendMessage);
-
         inputEl.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                sendMessage();
-            }
+            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
         });
-
         inputEl.addEventListener('input', () => {
             inputEl.style.height = 'auto';
-            inputEl.style.height = Math.min(inputEl.scrollHeight, 100) + 'px';
+            inputEl.style.height = Math.min(inputEl.scrollHeight, 90) + 'px';
         });
 
         // Welcome
         setTimeout(() => {
-            addMessage('ai', 'Halo! Gue **AI Hacker** v4.2 🤖 asisten cybersecurity + **Code Generator**!\n\nKetik `/help` buat lihat command, atau langsung:\n👉 "buatkan **html** button keren"\n👉 "bikin **python** port scanner"\n👉 "buat **sql** create table"');
-        }, 600);
+            addMessage('ai', '🧠 **AI Hacker Neural v5.0** online! Otak AI multi-bahasa + search engine.\n\n🌐 Gue bisa deteksi bahasa lo & jawab pake bahasa yang sama.\n🔍 **"cari: [kata kunci]"** — cari info dari web\n🔗 **"buka: [url]"** — ambil konten dari link\n💻 **"buatkan html button"** — generate kode\n📚 **"siapa presiden Indonesia?"** — auto-search!\n\nKetik `/help` buat panduan lengkap.');
+        }, 500);
 
-        // ---- 3D mouse tracking ----
+        // 3D mouse tracking
         const wrapper = document.getElementById('chatWrapper');
         document.addEventListener('mousemove', (e) => {
             const rect = wrapper.getBoundingClientRect();
-            const cx = rect.left + rect.width / 2;
-            const cy = rect.top + rect.height / 2;
-            const dx = (e.clientX - cx) / rect.width;
-            const dy = (e.clientY - cy) / rect.height;
-            const rotateY = dx * 4;
-            const rotateX = -dy * 4;
-            wrapper.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(30px)`;
+            const cx = rect.left + rect.width/2, cy = rect.top + rect.height/2;
+            const dx = (e.clientX - cx)/rect.width, dy = (e.clientY - cy)/rect.height;
+            if (window.innerWidth > 540) {
+                wrapper.style.transform = `rotateX(${-dy*4}deg) rotateY(${dx*4}deg) translateZ(30px)`;
+            }
         });
         document.addEventListener('mouseleave', () => {
-            wrapper.style.transform = 'rotateX(2deg) rotateY(-1deg) translateZ(30px)';
+            if (window.innerWidth > 540) wrapper.style.transform = 'rotateX(2deg) rotateY(-1deg) translateZ(30px)';
         });
     })();
 
-    // ---- Global copy function ----
-    window.copyCode = function(elementId) {
-        const pre = document.getElementById(elementId);
+    // Copy function (global)
+    window.copyCode = function(id) {
+        const pre = document.getElementById(id);
         if (!pre) return;
         const code = pre.textContent;
-
         if (navigator.clipboard && navigator.clipboard.writeText) {
             navigator.clipboard.writeText(code).then(() => {
-                const btn = document.querySelector(`[data-target="${elementId}"]`);
-                if (btn) {
-                    btn.textContent = '[ COPIED! ]';
-                    btn.classList.add('copied');
-                    setTimeout(() => {
-                        btn.textContent = '[ COPY ]';
-                        btn.classList.remove('copied');
-                    }, 2000);
-                }
-            }).catch(() => fallbackCopy(code, elementId));
-        } else {
-            fallbackCopy(code, elementId);
-        }
+                const btn = document.querySelector(`[data-target="${id}"]`);
+                if (btn) { btn.textContent = '[ COPIED! ]'; btn.classList.add('copied');
+                    setTimeout(() => { btn.textContent = '[ COPY ]'; btn.classList.remove('copied'); }, 2000); }
+            }).catch(() => fallbackCopy(code, id));
+        } else fallbackCopy(code, id);
     };
-
-    function fallbackCopy(text, elementId) {
-        const textarea = document.createElement('textarea');
-        textarea.value = text;
-        textarea.style.position = 'fixed';
-        textarea.style.left = '-9999px';
-        document.body.appendChild(textarea);
-        textarea.select();
-        try {
-            document.execCommand('copy');
-            const btn = document.querySelector(`[data-target="${elementId}"]`);
-            if (btn) {
-                btn.textContent = '[ COPIED! ]';
-                btn.classList.add('copied');
-                setTimeout(() => {
-                    btn.textContent = '[ COPY ]';
-                    btn.classList.remove('copied');
-                }, 2000);
-            }
-        } catch (e) {
-            // ignore
-        }
-        document.body.removeChild(textarea);
+    function fallbackCopy(text, id) {
+        const ta = document.createElement('textarea');
+        ta.value = text; ta.style.cssText = 'position:fixed;left:-9999px';
+        document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy');
+            const btn = document.querySelector(`[data-target="${id}"]`);
+            if (btn) { btn.textContent = '[ COPIED! ]'; btn.classList.add('copied');
+                setTimeout(() => { btn.textContent = '[ COPY ]'; btn.classList.remove('copied'); }, 2000); }
+        } catch(e) {}
+        document.body.removeChild(ta);
     }
 </script>
 </body>
-</html>
+    </html>

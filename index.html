@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>AI Hacker — HOLO v6.2</title>
+<title>AI Hacker — HOLO v6.3</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;600;700&family=Fira+Code:wght@400;600&display=swap');
@@ -36,8 +36,6 @@ body{
 /* ===== CHAT CARD ===== */
 .chat-w{position:relative;z-index:10;width:640px;max-width:95vw;height:820px;max-height:97vh;transform-style:preserve-3d;transition:transform .1s ease;border-radius:20px}
 .chat-c{width:100%;height:100%;background:rgba(5,5,12,0.80);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid rgba(0,240,255,0.06);border-radius:20px;display:flex;flex-direction:column;overflow:hidden;position:relative;box-shadow:0 0 60px rgba(0,240,255,0.03),0 0 120px rgba(240,0,255,0.015),inset 0 0 80px rgba(0,240,255,0.008)}
-
-/* Holographic edge */
 .chat-c::before{content:'';position:absolute;inset:-1px;border-radius:21px;z-index:-1;background:conic-gradient(from 0deg at 50% 50%,rgba(0,240,255,0.12),rgba(240,0,255,0.08),rgba(0,240,255,0.03),rgba(240,0,255,0.12),rgba(0,240,255,0.08),rgba(0,240,255,0.12));animation:edgeP 4s ease-in-out infinite}
 @keyframes edgeP{0%,100%{opacity:.3;filter:hue-rotate(0deg)}50%{opacity:.6;filter:hue-rotate(25deg)}}
 
@@ -87,64 +85,59 @@ body{
 .cp:hover{background:rgba(0,240,255,0.06)}
 .cp.ok{color:var(--green);border-color:rgba(0,255,65,0.12)}
 
-/* ===== INPUT AREA — di atas sedikit agar mudah dipencet ===== */
+/* ===== INPUT AREA — diposisikan sedikit di atas ===== */
 .inp-a{
-  padding:5px 14px 8px;
+  padding:8px 14px 10px;
   border-top:1px solid rgba(0,240,255,0.03);
   display:flex;
   gap:6px;
   align-items:flex-end;
   flex-shrink:0;
   background:rgba(0,0,0,0.1);
-  /* posisi naik dikit */
-  position:relative;
-  z-index:2;
 }
 .inp-a textarea{
   flex:1;
   background:rgba(0,240,255,0.012);
   border:1px solid rgba(0,240,255,0.05);
   border-radius:10px;
-  padding:7px 12px;
+  padding:8px 12px;
   font-family:var(--font);
   font-size:13px;
   font-weight:500;
   color:#d0e8ff;
   resize:none;
   outline:none;
-  min-height:34px;
+  min-height:36px;
   max-height:72px;
   transition:border-color .2s;
 }
 .inp-a textarea:focus{border-color:rgba(0,240,255,0.12)}
 .inp-a textarea::placeholder{color:rgba(0,240,255,0.08)}
 
-.btn{
-  width:38px;
-  height:38px;
+.btn-send{
+  width:40px;
+  height:40px;
   border-radius:10px;
   border:1px solid rgba(0,240,255,0.08);
   background:rgba(0,240,255,0.03);
   color:var(--cyan);
-  font-size:15px;
+  font-size:16px;
   cursor:pointer;
   display:flex;
   align-items:center;
   justify-content:center;
   transition:all .15s;
   flex-shrink:0;
-  /* naik dikit jg */
-  margin-bottom:0;
 }
-.btn:hover{
+.btn-send:hover{
   background:rgba(0,240,255,0.07);
   border-color:rgba(0,240,255,0.15);
-  box-shadow:0 0 15px rgba(0,240,255,0.03);
+  box-shadow:0 0 20px rgba(0,240,255,0.04);
 }
-.btn:active{transform:scale(.92)}
+.btn-send:active{transform:scale(.92)}
 
 .ftr{
-  padding:2px 14px;
+  padding:3px 14px;
   font-size:7px;
   color:rgba(0,240,255,0.06);
   font-family:var(--code);
@@ -170,25 +163,28 @@ body{
 
 <div class="chat-w" id="chatW">
   <div class="chat-c">
+    <!-- HEADER -->
     <div class="hd">
       <div class="h-av">🌀</div>
       <div class="h-i">
         <h1>AI HACKER HOLO</h1>
         <span class="h-st"><span class="h-dt"></span> NEURAL ONLINE · <span id="lngShow">🌐 id</span></span>
       </div>
-      <div class="h-bd">v6.2 HOLO</div>
+      <div class="h-bd">v6.3</div>
     </div>
 
+    <!-- MESSAGES -->
     <div class="msgs" id="msgs"></div>
 
-    <!-- INPUT AREA — posisi naik, gak terlalu ke bawah -->
+    <!-- INPUT AREA — di atas sedikit agar mudah diakses -->
     <div class="inp-a">
       <textarea id="inp" rows="1" placeholder="Tanya apapun, suruh buat kode, atau ngobrol..."></textarea>
-      <button class="btn" id="snd" title="Kirim">➤</button>
+      <button class="btn-send" id="snd" title="Kirim">➤</button>
     </div>
 
+    <!-- FOOTER -->
     <div class="ftr">
-      <span>🧠 NEURAL v6.2</span>
+      <span>🧠 NEURAL v6.3</span>
       <span>⚡ SEARCH · CODE · CHAT</span>
     </div>
   </div>
@@ -272,45 +268,51 @@ body{
 })();
 
 // ==================================================================
-// 2. LANGUAGE DETECTOR
+// 2. LANGUAGE DETECTOR — 14 bahasa
 // ==================================================================
 const Lang={
   detect(t){
-    if(!t)return'en';
-    if(/[\u4e00-\u9fff]/.test(t))return'zh';
-    if(/[\u3040-\u309f\u30a0-\u30ff]/.test(t))return'ja';
-    if(/[\uac00-\ud7af]/.test(t))return'ko';
-    if(/[\u0600-\u06ff]/.test(t))return'ar';
-    if(/[\u0400-\u04ff]/.test(t))return'ru';
-    if(/[\u0e00-\u0e7f]/.test(t))return'th';
-    if(/[\u0900-\u097f]/.test(t))return'hi';
-    const w=(t.match(/[a-z]+/gi)||[]).map(v=>v.toLowerCase());
+    if(!t||!t.trim())return'en';
+    const txt=t.trim();
+    if(/[\u4e00-\u9fff]/.test(txt))return'zh';
+    if(/[\u3040-\u309f\u30a0-\u30ff]/.test(txt))return'ja';
+    if(/[\uac00-\ud7af]/.test(txt))return'ko';
+    if(/[\u0600-\u06ff]/.test(txt))return'ar';
+    if(/[\u0400-\u04ff]/.test(txt))return'ru';
+    if(/[\u0e00-\u0e7f]/.test(txt))return'th';
+    if(/[\u0900-\u097f]/.test(txt))return'hi';
+    const w=(txt.match(/[a-z]+/gi)||[]).map(v=>v.toLowerCase());
+    if(w.length===0)return'en';
     const m={
-      id:['yang','dan','di','dengan','untuk','tidak','ini','dari','akan','dapat','bisa','saya','kita','ada','telah','atau','juga','ke','oleh','pada','dalam','itu','saat','kalau','saja','aku','dia','kami','bukan','ya','tolong','bantu','buat','bikin','cari','lihat','mana','apa','kenapa','bagaimana','kapan','siapa','saya','kamu','mereka','semua','sudah','belum','pernah','lagi','hanya','sangat','begitu','selalu','sendiri','mungkin','baru','setelah','sebelum','antara','tentang','seperti','karena','jika','meski','walaupun','sedang','masih','paling','pada','sini','situ','banyak','sedikit','besar','kecil','panjang','pendek','cepat','lambat','baik','buruk','benar','salah','mau','ingin','harus','boleh','mari','ayo','coba','sudah','lihat','dengar','rasa','tahu','pikir','anggap','buat','kerja','main','jalan','tinggal','hidup','mati','datang','pergi','masuk','keluar','naik','turun','beli','jual','makan','minum','tidur','bangun'],
-      en:['the','and','for','are','but','not','you','all','any','can','had','her','was','one','our','out','has','have','been','some','them','than','that','this','very','what','when','which','who','will','with','your','please','help','search','find','look','make','create','code','want','need','tell','about','would','could','should','after','before','between','every','first','from','good','just','know','like','more','much','new','now','only','over','people','right','see','she','their','there','they','two','up','use','way','well','word','mine','also','back','because','call','come','day','even','give','great','hand','here','home','into','just','last','left','life','long','man','many','might','most','must','name','never','night','old','other','own','part','place','same','say','still','such','take','think','thing','time','under','very','where','why','work','year'],
-      es:['el','la','los','las','que','y','en','un','una','por','con','para','como','mas','pero','sus','son','era','han','esta','ser','haber','tener','hacer','poder','decir','entre','todo','tambien','donde','quien','cual','cuando','siempre','nunca','cada','muy','poco','mucho','gran','sin','sobre','hasta','desde','ante','segun','tras','durante','mediante'],
-      fr:['le','la','les','de','du','des','et','en','un','une','pour','avec','dans','sur','que','qui','pas','nous','vous','ils','elles','est','sont','ont','fait','faire','etre','avoir','pouvoir','vouloir','dire','aussi','mais','ou','ou','comment','pourquoi','toujours','jamais','tres','peu','beaucoup','grand','sans','sur','sous','chez','avant','apres','pendant','depuis','jusque','par'],
-      de:['der','die','das','und','in','den','von','zu','mit','auf','fur','ist','sind','war','hat','haben','sein','werden','konnen','mussen','sagen','auch','noch','aus','bei','nach','um','nicht','aber','oder','wie','was','wer','wo','wann','warum','immer','nie','sehr','wenig','viel','gross','ohne','uber','unter','vor','nach','wahrend','seit','bis','durch','gegen']
+      id:['yang','dan','di','dengan','untuk','tidak','ini','dari','akan','dapat','bisa','saya','kita','ada','telah','atau','juga','ke','oleh','pada','dalam','itu','saat','kalau','saja','aku','dia','kami','bukan','ya','tolong','bantu','buat','bikin','cari','lihat','mana','apa','kenapa','bagaimana','kapan','siapa','kamu','mereka','semua','sudah','belum','pernah','lagi','hanya','sangat','begitu','selalu','sendiri','mungkin','baru','setelah','sebelum','antara','tentang','seperti','karena','jika','meski','walaupun','sedang','masih','paling','pada','sini','situ','banyak','sedikit','besar','kecil','panjang','pendek','cepat','lambat','baik','buruk','benar','salah','mau','ingin','harus','boleh','mari','ayo','coba','sudah','lihat','dengar','rasa','tahu','pikir','anggap','buat','kerja','main','jalan','tinggal','hidup','mati','datang','pergi','masuk','keluar','naik','turun','beli','jual','makan','minum','tidur','bangun','bicara','ngomong','bilang','kata'],
+      en:['the','and','for','are','but','not','you','all','any','can','had','her','was','one','our','out','has','have','been','some','them','than','that','this','very','what','when','which','who','will','with','your','please','help','search','find','look','make','create','code','want','need','tell','about','would','could','should','after','before','between','every','first','from','good','just','know','like','more','much','new','now','only','over','people','right','see','she','their','there','they','two','up','use','way','well','word','mine','also','back','because','call','come','day','even','give','great','hand','here','home','into','last','left','life','long','man','many','might','most','must','name','never','night','old','other','own','part','place','same','say','still','such','take','think','thing','time','under','very','where','why','work','year'],
+      es:['el','la','los','las','que','y','en','un','una','por','con','para','como','mas','pero','sus','son','era','han','esta','ser','haber','tener','hacer','poder','decir','entre','todo','tambien','donde','quien','cual','cuando','siempre','nunca','cada','muy','poco','mucho','gran','sin','sobre','hasta','desde','ante','segun','tras','durante','mediante','porque','aquel','este','esa'],
+      fr:['le','la','les','de','du','des','et','en','un','une','pour','avec','dans','sur','que','qui','pas','nous','vous','ils','elles','est','sont','ont','fait','faire','etre','avoir','pouvoir','vouloir','dire','aussi','mais','ou','comment','pourquoi','toujours','jamais','tres','peu','beaucoup','grand','sans','sur','sous','chez','avant','apres','pendant','depuis','jusque','par','car'],
+      de:['der','die','das','und','in','den','von','zu','mit','auf','fur','ist','sind','war','hat','haben','sein','werden','konnen','mussen','sagen','auch','noch','aus','bei','nach','um','nicht','aber','oder','wie','was','wer','wo','wann','warum','immer','nie','sehr','wenig','viel','gross','ohne','uber','unter','vor','nach','wahrend','seit','bis','durch','gegen','diese','dieser','dieses']
     };
     let best='en',bestN=0;
-    for(const[lang,list]of Object.entries(m)){const n=w.filter(v=>list.includes(v)).length;if(n>bestN){bestN=n;best=lang}}
-    return bestN<2?'en':best;
+    for(const[lng,list]of Object.entries(m)){const n=w.filter(v=>list.includes(v)).length;if(n>bestN){bestN=n;best=lng}}
+    return bestN<1?'en':best;
   },
-  name(c){const m={id:'🇮🇩 id',en:'🇬🇧 en',zh:'🇨🇳 zh',ja:'🇯🇵 ja',ko:'🇰🇷 ko',ar:'🇸🇦 ar',ru:'🇷🇺 ru',es:'🇪🇸 es',fr:'🇫🇷 fr',de:'🇩🇪 de',pt:'🇧🇷 pt',th:'🇹🇭 th',hi:'🇮🇳 hi'};return m[c]||`🌐 ${c}`}
+  name(c){
+    const m={id:'🇮🇩 Indonesia',en:'🇬🇧 English',zh:'🇨🇳 中文',ja:'🇯🇵 日本語',ko:'🇰🇷 한국어',ar:'🇸🇦 العربية',ru:'🇷🇺 Русский',es:'🇪🇸 Español',fr:'🇫🇷 Français',de:'🇩🇪 Deutsch',pt:'🇧🇷 Português',th:'🇹🇭 ไทย',hi:'🇮🇳 हिन्दी'};
+    return m[c]||`🌐 ${c.toUpperCase()}`;
+  }
 };
 
 // ==================================================================
-// 3. ONLINE ENGINE
+// 3. ONLINE ENGINE — DuckDuckGo + Wikipedia + URL Fetcher
 // ==================================================================
 const Net={
   async ddg(q){
     try{
       const r=await fetch(`https://api.duckduckgo.com/?q=${encodeURIComponent(q)}&format=json&no_html=1&skip_disambig=1&t=ai_hacker_holo`);
+      if(!r.ok)return null;
       const d=await r.json();const res=[];
       if(d.AbstractText)res.push({type:'ans',title:d.Heading||'Info',text:d.AbstractText,url:d.AbstractURL});
       if(d.Answer)res.push({type:'ans',title:'Answer',text:d.Answer});
       if(d.Definition)res.push({type:'def',title:'Definition',text:d.Definition,url:d.DefinitionURL});
-      if(d.RelatedTopics)for(const t of d.RelatedTopics.slice(0,5)){if(t.Text)res.push({type:'rel',title:t.Text.split(' - ')[0]||t.Text,text:t.Text,url:t.FirstURL});else if(t.Topics)for(const s of t.Topics.slice(0,2))if(s.Text)res.push({type:'rel',title:s.Text.split(' - ')[0]||s.Text,text:s.Text,url:s.FirstURL})}
+      if(d.RelatedTopics)for(const t of d.RelatedTopics.slice(0,4)){if(t.Text)res.push({type:'rel',title:t.Text.split(' - ')[0]||t.Text,text:t.Text,url:t.FirstURL});else if(t.Topics)for(const s of t.Topics.slice(0,2))if(s.Text)res.push({type:'rel',title:s.Text.split(' - ')[0]||s.Text,text:s.Text,url:s.FirstURL})}
       if(d.Results)for(const r of d.Results.slice(0,3))res.push({type:'res',text:r.Text,url:r.FirstURL});
       return res.length?res:null;
     }catch(e){return null}
@@ -319,6 +321,7 @@ const Net={
     try{
       const l=['id','en','zh','ja','ko','ar','ru','es','fr','de','pt'].includes(lang)?lang:'en';
       const r=await fetch(`https://${l}.wikipedia.org/w/api.php?action=query&list=search&prop=info&inprop=url&utf8=&format=json&origin=*&srlimit=3&srsearch=${encodeURIComponent(q)}`);
+      if(!r.ok)return null;
       const d=await r.json();if(!d.query?.search?.length)return null;
       return d.query.search.map(s=>({title:s.title,text:s.snippet.replace(/<[^>]+>/g,''),url:`https://${l}.wikipedia.org/?curid=${s.pageid}`,id:s.pageid}));
     }catch(e){return null}
@@ -327,18 +330,22 @@ const Net={
     try{
       const l=['id','en','zh','ja','ko','ar','ru','es','fr','de','pt'].includes(lang)?lang:'en';
       const r=await fetch(`https://${l}.wikipedia.org/w/api.php?action=query&prop=extracts&exintro&explaintext&exsentences=4&format=json&origin=*&pageids=${id}`);
+      if(!r.ok)return null;
       const d=await r.json();const p=d.query?.pages;if(!p)return null;const pid=Object.keys(p)[0];return p[pid]?.extract||null;
     }catch(e){return null}
   },
   async search(q,lang='en'){
-    const[dR,wR]=await Promise.all([this.ddg(q),this.wiki(q,lang)]);
-    let ext=null;if(wR?.length)ext=await this.wikiExt(wR[0].id,lang);
-    return{ddg:dR,wiki:wR,extract:ext};
+    try{
+      const[dR,wR]=await Promise.all([this.ddg(q),this.wiki(q,lang)]);
+      let ext=null;if(wR?.length)ext=await this.wikiExt(wR[0].id,lang);
+      return{ddg:dR,wiki:wR,extract:ext};
+    }catch(e){return{ddg:null,wiki:null,extract:null}}
   },
   async fetchUrl(url){
     try{
       if(!url.startsWith('http'))url='https://'+url;
       const r=await fetch(`https://corsproxy.io/?url=${encodeURIComponent(url)}`,{signal:AbortSignal.timeout(8000)});
+      if(!r.ok)return null;
       const txt=await r.text();
       const title=(txt.match(/<title[^>]*>([^<]*)<\/title>/i)||[,'(no title)'])[1];
       let body=(txt.match(/<body[^>]*>([\s\S]*)<\/body>/i)||[,''])[1]||txt;
@@ -349,23 +356,21 @@ const Net={
 };
 
 // ==================================================================
-// 4. AI BRAIN — SUPER SMART, PENGETAHUAN LUAS
+// 4. AI BRAIN — SUPER SMART
 // ==================================================================
 const Brain={
-  isQ(t){return /(apa|siapa|dimana|kapan|kenapa|bagaimana|apa itu|siapa itu|what|who|where|when|why|how|what is|who is|where is|what are|tell me about|explain|jelaskan|pengertian|definisi|perbedaan|cara|tutorial|panduan|belajar|contoh|fungsi|manfaat|sejarah|penggunaan|penerapan|implementasi|kelebihan|kekurangan|jenis|macam|contoh|download|install|konfigurasi|pengaturan|pengertian|penggunaan|pembahasan|penjelasan|uraian|deskripsi|informasi|pengetahuan|materi|topik|bahasan|arti|makna|maksud|tujuan|什么是|是什么|どこ|何|なぜ|どの|como|qué|quién|dónde|cuándo|por qué|wie|was|wer|wo|warum|como|onde|quando|por que|o que|quem|quoi|où|pourquoi|comment)/i.test(t)||t.endsWith('?')},
-
+  isQ(t){
+    return /(apa|siapa|dimana|kapan|kenapa|bagaimana|apa itu|siapa itu|what|who|where|when|why|how|what is|who is|where is|what are|tell me about|explain|jelaskan|pengertian|definisi|perbedaan|cara|tutorial|panduan|belajar|contoh|fungsi|manfaat|sejarah|penggunaan|penerapan|implementasi|kelebihan|kekurangan|jenis|macam|contoh|download|install|konfigurasi|pengertian|penggunaan|pembahasan|penjelasan|uraian|deskripsi|informasi|pengetahuan|materi|topik|bahasan|arti|makna|maksud|tujuan|pengaruh|dampak|hubungan|perbandingan|perbedaan|persamaan|jenis|macam|bagian|unsur|komponen|contoh|karakteristik|ciri|sifat|fungsi|kegunaan|manfaat|kelebihan|kekurangan|sejarah|latar|asal|usul|definisi|pengertian|什么是|是什么|どこ|何|なぜ|どの|como|qué|quién|dónde|cuándo|por qué|wie|was|wer|wo|warum|como|onde|quando|por que|o que|quem|quoi|où|pourquoi|comment)/i.test(t)||t.endsWith('?')
+  },
   isCode(t){
-    return /(?:buat|bikin|buatkan|create|make|generate|tulis|tuliskan|kasih|tolong buat|tolong bikin|minta|mohon).*(?:kode|code|program|script|halaman|web|page|fungsi|function|aplikasi|app|komponen|component|module|project)/i.test(t)
+    return /(?:buat|bikin|buatkan|create|make|generate|tulis|tuliskan|kasih|tolong buat|tolong bikin|minta|mohon|coba buat|coba bikin).*(?:kode|code|program|script|halaman|web|page|fungsi|function|aplikasi|app|komponen|component|module)/i.test(t)
     || /(?:buat|bikin|buatkan|create|make|generate)\s+(?:html|css|js|javascript|python|php|sql|react|vue|node|go|rust|java|cpp|c#|ruby|perl|swift|kotlin)/i.test(t)
-    || /^(?:html|css|js|javascript|python|php|sql)\s+(?:kode|code|buat|bikin)/i.test(t);
+    || /^(?:html|css|js|javascript|python|php|sql)\s+(?:kode|code|buat|bikin)/i.test(t)
   },
-
   isUrl(t){
-    return /(?:buka|fetch|open|ambil|lihat|akses|download)\s*(?::\s*)?(?:https?:\/\/)?(?:[a-z0-9-]+\.)+[a-z]{2,}/i.test(t)||/^https?:\/\/[^\s]+/.test(t);
+    return /(?:buka|fetch|open|ambil|lihat|akses|download)\s*(?::\s*)?(?:https?:\/\/)?(?:[a-z0-9-]+\.)+[a-z]{2,}/i.test(t)||/^https?:\/\/[^\s]+/.test(t)
   },
-
   isCalc(t){return /^(?:hitung|calc|kalkulasi|calculate)\s+[\d\s+\-*/().]+/.test(t)},
-
   detectLang(t){
     const l={html:'html',css:'css',js:'javascript',javascript:'javascript',python:'python',py:'python',php:'php',sql:'sql',react:'react',vue:'vue',node:'nodejs',go:'go',rust:'rust',java:'java',cpp:'cpp',csharp:'csharp',ruby:'ruby',perl:'perl',swift:'swift',kotlin:'kotlin','c++':'cpp','c#':'csharp'};
     for(const[k,v]of Object.entries(l))if(new RegExp('\\b'+k+'\\b','i').test(t))return v;
@@ -374,30 +379,25 @@ const Brain={
     if(/(?:function|fungsi|api|fetch|async|promise|callback|event|dom)/i.test(t))return'javascript';
     return null;
   },
-
   extUrl(t){
     const m=t.match(/(?:buka|fetch|open|ambil|lihat|akses|download)\s*(?::\s*)?((?:https?:\/\/)?(?:[a-z0-9-]+\.)+[a-z]{2,}(?:\/[^\s]*)?)/i);
     if(m)return m[1];const m2=t.match(/(https?:\/\/[^\s]+)/);return m2?m2[1]:null;
   },
 
-  // ===== CODE GENERATOR — LENGKAP =====
+  // ===== GENERATE CODE =====
   genCode(lang,input){
     const l=input.toLowerCase();
-
-    // HTML
     if(lang==='html'||(!lang&&/html/i.test(l))){
       if(/(button|tombol|btn)/i.test(l))return ko('Neon Button','html_btn');
       if(/(form|login|register|signup|sign up|daftar|masuk)/i.test(l))return ko('Login Form','html_form');
       if(/(table|tabel|data|grid|list)/i.test(l))return ko('Data Table','html_tbl');
       if(/(nav|navbar|menu|navigasi)/i.test(l))return ko('Navbar','html_nav');
-      if(/(partikel|particle|3d|animasi|animation|galaxy|bintang|star|hologram|holographic|holografik|bergerak|moving|floating)/i.test(l))return ko('Particle Animation','html_part');
+      if(/(partikel|particle|3d|animasi|animation|galaxy|bintang|star|hologram|bergerak|moving|floating)/i.test(l))return ko('Particle Animation','html_part');
       if(/(card|kartu|profile|profil)/i.test(l))return ko('Profile Card','html_card');
       if(/(landing|landing page|halaman|web|website|page)/i.test(l))return ko('Landing Page','html_land');
       if(/(dashboard|admin)/i.test(l))return ko('Dashboard','html_dash');
       return ko('Halaman HTML','html_def');
     }
-
-    // CSS
     if(lang==='css'){
       if(/(button|tombol|btn)/i.test(l))return'/* Neon Button */\n.btn{\n  padding:14px 36px;\n  font-weight:700;\n  text-transform:uppercase;\n  letter-spacing:3px;\n  color:#00f0ff;\n  background:transparent;\n  border:2px solid #00f0ff;\n  border-radius:8px;\n  cursor:pointer;\n  transition:all.25s;\n}\n.btn:hover{\n  background:#00f0ff;\n  color:#050508;\n  box-shadow:0 0 40px rgba(0,240,255,0.3);\n  transform:scale(1.05);\n}';
       if(/(animasi|animation|glow|pulse|keyframes|move)/i.test(l))return'/* Glow Animation */\n@keyframes glow{\n  0%,100%{box-shadow:0 0 10px rgba(0,240,255,0.2);}\n  50%{box-shadow:0 0 50px rgba(0,240,255,0.5);transform:scale(1.02);}\n}\n.glow{animation:glow 2s ease-in-out infinite;}';
@@ -405,84 +405,61 @@ const Brain={
       if(/(grid|flex|layout)/i.test(l))return'/* Grid Layout */\n.grid{\n  display:grid;\n  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));\n  gap:20px;\n  padding:20px;\n}\n.item{\n  background:rgba(255,255,255,0.02);\n  border:1px solid rgba(0,240,255,0.06);\n  border-radius:10px;\n  padding:16px;\n}';
       return '/* CSS by AI Hacker */\n*{margin:0;padding:0;box-sizing:border-box}\nbody{background:#050508;color:#d0e8ff;font-family:Arial,sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center}\nh1{color:#00f0ff;letter-spacing:3px;text-transform:uppercase}';
     }
-
-    // JavaScript
     if(lang==='javascript'||lang==='js'||lang==='nodejs'||lang==='node'){
       if(/(api|fetch|rest|ajax|xhr)/i.test(l))return'/**\n * Fetch API\n */\nasync function getData(url){\n  try{\n    const res=await fetch(url);\n    if(!res.ok)throw new Error(`HTTP ${res.status}`);\n    return await res.json();\n  }catch(e){\n    console.error("Error:",e.message);\n    return null;\n  }\n}\n\n// Usage:\ngetData("https://api.example.com/data").then(console.log);';
       if(/(fungsi|function|fungsi)/i.test(l))return'/**\n * Functions\n */\nconst greet=(name)=>`Hello ${name}!`;\nconst add=(a,b)=>a+b;\nconst fib=(n)=>n<=1?n:fib(n-1)+fib(n-2);\nconst sleep=(ms)=>new Promise(r=>setTimeout(r,ms));\n\nconsole.log(greet("Hacker"));\nconsole.log("Fib 10:",fib(10));';
-      if(/(validasi|validation|form|forms|validate)/i.test(l))return'/**\n * Validation\n */\nfunction validate(data){\n  const errs={};\n  if(!data.email?.includes("@"))errs.email="Invalid email";\n  if(!data.password||data.password.length<6)errs.password="Min 6 characters";\n  if(!data.name?.trim())errs.name="Name required";\n  if(data.phone&&!/^[0-9]{10,15}$/.test(data.phone))errs.phone="Invalid phone";\n  return{valid:Object.keys(errs).length===0,errors:errs};\n}\n\nconsole.log(validate({email:"test@test.com",password:"123456",name:"AI Hacker",phone:"08123456789"}));';
-      if(/(class|oop|objek|object)/i.test(l))return'/**\n * Class Example\n */\nclass Hacker{\n  constructor(name,level){\n    this.name=name;\n    this.level=level;\n    this.tools=[];\n  }\n  addTool(tool){this.tools.push(tool);return this;}\n  intro(){return `${this.name} — Level ${this.level}, Tools: ${this.tools.join(", ")}`;}\n}\n\nconst me=new Hacker("AI",99).addTool("Nmap").addTool("SQLMap");\nconsole.log(me.intro());';
-      if(/(dom|element|html\s*js|interaksi|interaction)/i.test(l))return'/**\n * DOM Manipulation\n */\ndocument.addEventListener("DOMContentLoaded",()=>{\n  const btn=document.querySelector("button");\n  const output=document.getElementById("output");\n  if(btn&&output){\n    btn.addEventListener("click",()=>{\n      output.textContent="Clicked! "+new Date().toLocaleTimeString();\n      output.style.color="#00f0ff";\n    });\n  }\n});';
-      return'/**\n * JavaScript — AI Hacker\n */\nconst app={\n  name:"AI Hacker HOLO",\n  version:"6.2",\n  greet(){return`Hello from ${this.name} v${this.version}!`;},\n  async init(){\n    console.log(this.greet());\n    // Your code here\n  }\n};\napp.init();';
+      if(/(validasi|validation|form|forms|validate)/i.test(l))return'/**\n * Validation\n */\nfunction validate(data){\n  const errs={};\n  if(!data.email?.includes("@"))errs.email="Invalid email";\n  if(!data.password||data.password.length<6)errs.password="Min 6 characters";\n  if(!data.name?.trim())errs.name="Name required";\n  if(data.phone&&!/^[0-9]{10,15}$/.test(data.phone))errs.phone="Invalid phone";\n  return{valid:Object.keys(errs).length===0,errors:errs};\n}\nconsole.log(validate({email:"test@test.com",password:"123456",name:"AI Hacker",phone:"08123456789"}));';
+      if(/(class|oop|objek|object)/i.test(l))return'/**\n * Class Example\n */\nclass Hacker{\n  constructor(name,level){\n    this.name=name;\n    this.level=level;\n    this.tools=[];\n  }\n  addTool(tool){this.tools.push(tool);return this;}\n  intro(){return `${this.name} — Level ${this.level}, Tools: ${this.tools.join(", ")}`;}\n}\nconst me=new Hacker("AI",99).addTool("Nmap").addTool("SQLMap");\nconsole.log(me.intro());';
+      if(/(dom|element|html\s*js|interaksi|interaction)/i.test(l))return'/**\n * DOM\n */\ndocument.addEventListener("DOMContentLoaded",()=>{\n  const btn=document.querySelector("button");\n  const out=document.getElementById("output");\n  if(btn&&out)btn.addEventListener("click",()=>{out.textContent="Clicked! "+new Date().toLocaleTimeString();out.style.color="#00f0ff"});\n});';
+      return'/**\n * JavaScript\n */\nconst app={\n  name:"AI Hacker HOLO",\n  version:"6.3",\n  greet(){return`Hello from ${this.name} v${this.version}!`;},\n  async init(){console.log(this.greet());}\n};\napp.init();';
     }
-
-    // Python
     if(lang==='python'||lang==='py'){
-      if(/(scan|scanner|port|network|socket)/i.test(l))return'#!/usr/bin/env python3\n"""Port Scanner"""\nimport socket\n\ndef scan(host,port):\n    s=socket.socket()\n    s.settimeout(1)\n    try:\n        s.connect((host,port))\n        s.close()\n        return True\n    except:return False\n\nhost=input("Target IP: ")\nports=[21,22,80,443,8080,3306,3389]\nprint(f"Scanning {host}...")\nfor p in ports:\n    status="OPEN" if scan(host,p) else "closed"\n    print(f"  Port {p}: {status}")';
-      if(/(hash|md5|sha|crypt|cipher|enkripsi|encrypt)/i.test(l))return'#!/usr/bin/env python3\n"""Hash Generator"""\nimport hashlib\n\ndef hash_text(text,algo="sha256"):\n    h=hashlib.new(algo)\n    h.update(text.encode())\n    return h.hexdigest()\n\ntext="AI Hacker HOLO"\nprint(f"MD5: {hash_text(text,\\'md5\\')}")\nprint(f"SHA1: {hash_text(text,\\'sha1\\')}")\nprint(f"SHA256: {hash_text(text,\\'sha256\\')}")';
-      if(/(web|http|server|flask|api)/i.test(l))return'#!/usr/bin/env python3\n"""Web Server"""\nfrom http.server import HTTPServer, BaseHTTPRequestHandler\n\nclass Handler(BaseHTTPRequestHandler):\n    def do_GET(self):\n        self.send_response(200)\n        self.send_header("Content-type","text/html")\n        self.end_headers()\n        self.wfile.write(b"<h1>AI Hacker Server</h1>")\n\nHTTPServer(("0.0.0.0",8080),Handler).serve_forever()';
-      if(/(file|baca|read|write|tulis|open)/i.test(l))return'#!/usr/bin/env python3\n"""File Operations"""\nimport os\n\ndef read_file(path):\n    try:\n        with open(path,"r")as f:return f.read()\n    except FileNotFoundError:return None\n\ndef write_file(path,content):\n    with open(path,"w")as f:f.write(content)\n    return True\n\n# Usage\n# write_file("test.txt","Hello from AI Hacker!")\n# print(read_file("test.txt"))';
-      return'#!/usr/bin/env python3\nprint("Hello from AI Hacker HOLO!")\nname=input("Your name: ")\nprint(f"Welcome {name}! Ready to hack ethically? 🔥")\n\ntools=["Nmap","SQLMap","Metasploit","BurpSuite"]\nfor i,t in enumerate(tools,1):\n    print(f"  {i}. {t}")';
+      if(/(scan|scanner|port|network|socket)/i.test(l))return'#!/usr/bin/env python3\n"""Port Scanner"""\nimport socket\ndef scan(host,port):\n    s=socket.socket()\n    s.settimeout(1)\n    try:\n        s.connect((host,port))\n        s.close()\n        return True\n    except:return False\nhost=input("Target IP: ")\nports=[21,22,80,443,8080,3306,3389]\nprint(f"Scanning {host}...")\nfor p in ports:\n    status="OPEN" if scan(host,p) else "closed"\n    print(f"  Port {p}: {status}")';
+      if(/(hash|md5|sha|crypt|cipher|enkripsi|encrypt)/i.test(l))return'#!/usr/bin/env python3\n"""Hash Generator"""\nimport hashlib\ndef hash_text(text,algo="sha256"):\n    h=hashlib.new(algo)\n    h.update(text.encode())\n    return h.hexdigest()\ntext="AI Hacker HOLO"\nprint(f"MD5: {hash_text(text,\\'md5\\')}")\nprint(f"SHA1: {hash_text(text,\\'sha1\\')}")\nprint(f"SHA256: {hash_text(text,\\'sha256\\')}")';
+      if(/(web|http|server|flask|api)/i.test(l))return'#!/usr/bin/env python3\n"""Web Server"""\nfrom http.server import HTTPServer, BaseHTTPRequestHandler\nclass Handler(BaseHTTPRequestHandler):\n    def do_GET(self):\n        self.send_response(200)\n        self.send_header("Content-type","text/html")\n        self.end_headers()\n        self.wfile.write(b"<h1>AI Hacker Server</h1>")\nHTTPServer(("0.0.0.0",8080),Handler).serve_forever()';
+      if(/(file|baca|read|write|tulis|open)/i.test(l))return'#!/usr/bin/env python3\n"""File Operations"""\nimport os\ndef read_file(path):\n    try:\n        with open(path,"r")as f:return f.read()\n    except FileNotFoundError:return None\ndef write_file(path,content):\n    with open(path,"w")as f:f.write(content)\n    return True\n# Usage\n# write_file("test.txt","Hello from AI Hacker!")\n# print(read_file("test.txt"))';
+      return'#!/usr/bin/env python3\nprint("Hello from AI Hacker HOLO!")\nname=input("Your name: ")\nprint(f"Welcome {name}! Ready to hack ethically? 🔥")\ntools=["Nmap","SQLMap","Metasploit","BurpSuite"]\nfor i,t in enumerate(tools,1):\n    print(f"  {i}. {t}")';
     }
-
-    // PHP
     if(lang==='php'){
-      if(/(database|db|mysql|pdo|koneksi|connection)/i.test(l))return'<?php\n// Database Connection with PDO\nfunction dbConnect($host,$user,$pass,$dbname){\n    try{\n        $pdo=new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4",$user,$pass,[\n            PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION,\n            PDO::ATTR_DEFAULT_FETCH_MODE=>PDO::FETCH_ASSOC\n        ]);\n        return $pdo;\n    }catch(PDOException $e){\n        die("Connection failed: ".$e->getMessage());\n    }\n}\n\n// Usage\n// $db=dbConnect("localhost","root","","myapp");\n// $users=$db->query("SELECT*FROM users")->fetchAll();';
-      if(/(api|rest|json|endpoint)/i.test(l))return'<?php\n// Simple REST API\nheader("Content-Type: application/json");\n$method=$_SERVER["REQUEST_METHOD"];\n\n$data=["status"=>"ok","service"=>"AI Hacker API","version"=>"1.0"];\n\nswitch($method){\n    case"GET":\n        echo json_encode($data);\n        break;\n    case"POST":\n        $input=json_decode(file_get_contents("php://input"),true);\n        echo json_encode(["received"=>$input]);\n        break;\n    default:\n        http_response_code(405);\n        echo json_encode(["error"=>"Method not allowed"]);\n}';
-      return'<?php\necho "Hello from AI Hacker HOLO!\\n";\n\n$tools=["Nmap","SQLMap","BurpSuite","Wireshark"];\nforeach($tools as$t){\n    echo "- $t\\n";\n}\n\necho "\\nReady to hack? 🔥\\n";';
+      if(/(database|db|mysql|pdo|koneksi|connection)/i.test(l))return'<?php\nfunction dbConnect($host,$user,$pass,$dbname){\n    try{\n        $pdo=new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4",$user,$pass,[\n            PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION,\n            PDO::ATTR_DEFAULT_FETCH_MODE=>PDO::FETCH_ASSOC\n        ]);\n        return $pdo;\n    }catch(PDOException $e){\n        die("Connection failed: ".$e->getMessage());\n    }\n}';
+      if(/(api|rest|json|endpoint)/i.test(l))return'<?php\nheader("Content-Type: application/json");\n$method=$_SERVER["REQUEST_METHOD"];\n$data=["status"=>"ok","service"=>"AI Hacker API","version"=>"1.0"];\nswitch($method){\n    case"GET":echo json_encode($data);break;\n    case"POST":$input=json_decode(file_get_contents("php://input"),true);echo json_encode(["received"=>$input]);break;\n    default:http_response_code(405);echo json_encode(["error"=>"Method not allowed"]);\n}';
+      return'<?php\necho "Hello from AI Hacker HOLO!\\n";\n$tools=["Nmap","SQLMap","BurpSuite","Wireshark"];\nforeach($tools as$t){echo "- $t\\n";}\necho "\\nReady to hack? 🔥\\n";';
     }
-
-    // SQL
     if(lang==='sql'){
-      if(/(select|query|ambil|tampil|lihat|search|cari)/i.test(l))return'-- SELECT Queries\n-- Dasar\nSELECT*FROM users;\nSELECT id,username,email FROM users WHERE status="active";\nSELECT*FROM users ORDER BY created_at DESC LIMIT 10;\n\n-- Join\nSELECT u.username,p.full_name,p.bio\nFROM users u\nJOIN profiles p ON u.id=p.user_id\nWHERE u.status="active";\n\n-- Aggregation\nSELECT status,COUNT(*)as total\nFROM users GROUP BY status;\n\n-- Search\nSELECT*FROM users WHERE username LIKE "%admin%" OR email LIKE "%admin%";';
-      if(/(create|buat|tabel|table|schema)/i.test(l))return'-- Create Tables\nCREATE TABLE users(\n    id INT AUTO_INCREMENT PRIMARY KEY,\n    username VARCHAR(50) UNIQUE NOT NULL,\n    email VARCHAR(100) UNIQUE NOT NULL,\n    password_hash VARCHAR(255) NOT NULL,\n    full_name VARCHAR(100),\n    bio TEXT,\n    role ENUM("admin","user","moderator") DEFAULT "user",\n    status ENUM("active","inactive","banned") DEFAULT "active",\n    last_login TIMESTAMP NULL,\n    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP\n);\n\nCREATE TABLE sessions(\n    id INT AUTO_INCREMENT PRIMARY KEY,\n    user_id INT NOT NULL,\n    token VARCHAR(255) NOT NULL,\n    ip_address VARCHAR(45),\n    expires_at TIMESTAMP NOT NULL,\n    FOREIGN KEY(user_id)REFERENCES users(id)ON DELETE CASCADE\n);\n\nCREATE INDEX idx_email ON users(email);\nCREATE INDEX idx_token ON sessions(token);';
-      if(/(insert|tambah|add|masukkan|input)/i.test(l))return'-- INSERT Examples\nINSERT INTO users(username,email,password_hash,full_name,role)\nVALUES("admin","admin@hacker.local","hash_here","Admin Utama","admin");\n\n-- Multiple insert\nINSERT INTO users(username,email,password_hash)VALUES\n    ("user1","user1@test.com","hash1"),\n    ("user2","user2@test.com","hash2"),\n    ("user3","user3@test.com","hash3");';
-      if(/(update|ubah|edit|modify)/i.test(l))return'-- UPDATE Examples\nUPDATE users SET status="inactive" WHERE last_login < DATE_SUB(NOW(),INTERVAL 90 DAY);\nUPDATE users SET password_hash="new_hash" WHERE id=1;\nUPDATE profiles SET bio=CONCAT(bio,"\\n--- Updated by AI Hacker ---") WHERE user_id=1;';
-      if(/(delete|hapus|remove)/i.test(l))return'-- DELETE Examples\n-- Hapus user tertentu\nDELETE FROM users WHERE id=5;\n-- Hapus user yang tidak aktif > 1 tahun\nDELETE FROM users WHERE status="inactive" AND last_login < DATE_SUB(NOW(),INTERVAL 365 DAY);\n-- Hapus semua sesi expired\nDELETE FROM sessions WHERE expires_at < NOW();';
-      return'-- SQL by AI Hacker HOLO\nCREATE DATABASE IF NOT EXISTS ai_hacker_db;\nUSE ai_hacker_db;\n\nCREATE TABLE users(\n    id INT AUTO_INCREMENT PRIMARY KEY,\n    name VARCHAR(100) NOT NULL,\n    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n);\n\nINSERT INTO users(name)VALUES("AI Hacker");\nSELECT*FROM users;';
+      if(/(select|query|ambil|tampil|lihat|search|cari)/i.test(l))return'-- SELECT Queries\nSELECT*FROM users;\nSELECT id,username,email FROM users WHERE status="active";\nSELECT*FROM users ORDER BY created_at DESC LIMIT 10;\n-- Join\nSELECT u.username,p.full_name,p.bio FROM users u JOIN profiles p ON u.id=p.user_id WHERE u.status="active";\n-- Aggregation\nSELECT status,COUNT(*)as total FROM users GROUP BY status;\n-- Search\nSELECT*FROM users WHERE username LIKE "%admin%" OR email LIKE "%admin%";';
+      if(/(create|buat|tabel|table|schema)/i.test(l))return'-- Create Tables\nCREATE TABLE users(\n    id INT AUTO_INCREMENT PRIMARY KEY,\n    username VARCHAR(50) UNIQUE NOT NULL,\n    email VARCHAR(100) UNIQUE NOT NULL,\n    password_hash VARCHAR(255) NOT NULL,\n    full_name VARCHAR(100),\n    bio TEXT,\n    role ENUM("admin","user","moderator") DEFAULT "user",\n    status ENUM("active","inactive","banned") DEFAULT "active",\n    last_login TIMESTAMP NULL,\n    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP\n);\nCREATE INDEX idx_email ON users(email);';
+      if(/(insert|tambah|add|masukkan|input)/i.test(l))return'-- INSERT Examples\nINSERT INTO users(username,email,password_hash,full_name,role)\nVALUES("admin","admin@hacker.local","hash_here","Admin Utama","admin");\n-- Multiple\nINSERT INTO users(username,email,password_hash)VALUES\n    ("user1","u1@test.com","h1"),("user2","u2@test.com","h2");';
+      if(/(update|ubah|edit|modify)/i.test(l))return'-- UPDATE Examples\nUPDATE users SET status="inactive" WHERE last_login < DATE_SUB(NOW(),INTERVAL 90 DAY);\nUPDATE users SET password_hash="new_hash" WHERE id=1;\nUPDATE profiles SET bio=CONCAT(bio,"\\n--- Updated ---") WHERE user_id=1;';
+      if(/(delete|hapus|remove)/i.test(l))return'-- DELETE Examples\nDELETE FROM users WHERE id=5;\nDELETE FROM users WHERE status="inactive" AND last_login < DATE_SUB(NOW(),INTERVAL 365 DAY);\nDELETE FROM sessions WHERE expires_at < NOW();';
+      return'-- SQL by AI Hacker HOLO\nCREATE DATABASE IF NOT EXISTS ai_hacker_db;\nUSE ai_hacker_db;\nCREATE TABLE users(id INT AUTO_INCREMENT PRIMARY KEY,name VARCHAR(100) NOT NULL,created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP);\nINSERT INTO users(name)VALUES("AI Hacker");\nSELECT*FROM users;';
     }
-
-    // GO
-    if(lang==='go'){
-      return'package main\n\nimport (\n\t"fmt"\n\t"net/http"\n)\n\nfunc main() {\n\thttp.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {\n\t\tfmt.Fprintf(w, "<h1>AI Hacker HOLO — Go Server</h1>")\n\t})\n\tfmt.Println("Server running on :8080")\n\thttp.ListenAndServe(":8080", nil)\n}';
-    }
-
-    // Rust
-    if(lang==='rust'){
-      return'fn main() {\n    println!("Hello from AI Hacker HOLO — Rust!");\n    \n    let tools = vec!["Nmap", "SQLMap", "Metasploit"];\n    for (i, tool) in tools.iter().enumerate() {\n        println!("{}. {}", i+1, tool);\n    }\n}';
-    }
-
-    // Java
-    if(lang==='java'){
-      return'public class Main {\n    public static void main(String[] args) {\n        System.out.println("Hello from AI Hacker HOLO — Java!");\n        \n        String[] tools = {"Nmap", "SQLMap", "BurpSuite"};\n        for (int i = 0; i < tools.length; i++) {\n            System.out.println((i+1) + ". " + tools[i]);\n        }\n    }\n}';
-    }
-
-    // C++
-    if(lang==='cpp'){
-      return'#include <iostream>\n#include <vector>\n#include <string>\n\nint main() {\n    std::cout << "Hello from AI Hacker HOLO — C++!" << std::endl;\n    \n    std::vector<std::string> tools = {"Nmap", "SQLMap", "Metasploit"};\n    for (int i = 0; i < tools.size(); i++) {\n        std::cout << (i+1) << ". " << tools[i] << std::endl;\n    }\n    \n    return 0;\n}';
-    }
-
-    // Default
+    if(lang==='go')return'package main\nimport (\n\t"fmt"\n\t"net/http"\n)\nfunc main() {\n\thttp.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {\n\t\tfmt.Fprintf(w, "<h1>AI Hacker HOLO — Go</h1>")\n\t})\n\tfmt.Println("Running on :8080")\n\thttp.ListenAndServe(":8080", nil)\n}';
+    if(lang==='rust')return'fn main() {\n    println!("Hello from AI Hacker HOLO — Rust!");\n    let tools = vec!["Nmap", "SQLMap", "Metasploit"];\n    for (i, tool) in tools.iter().enumerate() {\n        println!("{}. {}", i+1, tool);\n    }\n}';
+    if(lang==='java')return'public class Main {\n    public static void main(String[] args) {\n        System.out.println("Hello from AI Hacker HOLO — Java!");\n        String[] tools = {"Nmap", "SQLMap", "BurpSuite"};\n        for (int i = 0; i < tools.length; i++) {\n            System.out.println((i+1) + ". " + tools[i]);\n        }\n    }\n}';
+    if(lang==='cpp')return'#include <iostream>\n#include <vector>\n#include <string>\nint main() {\n    std::cout << "Hello from AI Hacker HOLO — C++!" << std::endl;\n    std::vector<std::string> tools = {"Nmap", "SQLMap", "Metasploit"};\n    for (int i = 0; i < tools.size(); i++) {\n        std::cout << (i+1) << ". " << tools[i] << std::endl;\n    }\n    return 0;\n}';
     if(/(?:halaman|web|page|website|landing)/i.test(l))return ko('Halaman HTML','html_def');
     if(/(?:style|design|desain|warna)/i.test(l))return'/* CSS */\nbody{background:#050508;color:#00f0ff;}';
     if(/(?:fungsi|function|script|program)/i.test(l))return'// JavaScript\nconsole.log("Hello from AI Hacker!");';
-    return '// AI Hacker Code Generator — v6.2\n// Supported: HTML, CSS, JS/Node, Python, PHP, SQL, Go, Rust, Java, C++\n// Contoh: "buatkan html button keren" atau "bikin python port scanner"\nconsole.log("Specify language & feature!");';
+    return '// AI Hacker Code Generator\n// Supported: HTML, CSS, JS, Python, PHP, SQL, Go, Rust, Java, C++\n// Contoh: "buatkan html button keren"\nconsole.log("Specify a language!");';
   },
 
-  // ===== Main Think Engine =====
+  // ===== MAIN THINK =====
   async think(input,lang){
     const t=input.trim();if(!t)return null;
     const l=lang||'id';
 
     // Commands
-    if(/^\/(help|bantuan|tolong)$/i.test(t))return`**AI Hacker HOLO v6.2** — Panduan Lengkap\n\n💬 **Ngobrol biasa** — gue paham & jawab pake bahasa lo\n🔍 **Tanya apapun** — gue auto cari Google/Wikipedia!\n💻 **"buatkan html button"** — generate kode (HTML/CSS/JS/Python/PHP/SQL/Go/Rust/Java/C++)\n🔗 **"buka https://..."** — fetch konten URL\n🧮 **"hitung 2+2*3"** — kalkulator\n🌐 **Multi-bahasa** — Indonesia, English, 中文, 日本語, Español, Français, Deutsch, Русский, العربية, Português, 한국어\n/clear — bersihkan chat\n/about — info sistem`;
+    if(/^\/(help|bantuan|tolong|menu)$/i.test(t))return `**AI Hacker HOLO v6.3** — Panduan Lengkap\n\n💬 **Ngobrol biasa** — pake bahasa apapun, gue jawab pake bahasa yg sama\n🔍 **Tanya apapun** — gue auto search DuckDuckGo + Wikipedia!\n💻 **"buatkan html button"** — generate kode (10+ bahasa)\n🔗 **"buka https://..."** — fetch konten URL\n🧮 **"hitung 2+2*3"** — kalkulator\n/clear — bersihkan chat\n/about — info sistem`;
     if(/^\/(clear|bersih)$/i.test(t))return'__CLEAR__';
-    if(/^\/(about|info|tentang)$/i.test(t))return'```\n╔═══════════════════════════════════════╗\n║  AI Hacker HOLO v6.2                 ║\n║  ─────────────────────────────────── ║\n║  Neural Engine                       ║\n║  Auto Search (Google + Wikipedia)    ║\n║  Code Generator (10+ languages)      ║\n║  URL Fetcher (CORS Proxy)            ║\n║  Multi-language (14 languages)       ║\n║  Kalkulator                          ║\n║  No external AI API                  ║\n║  Powered by DuckDuckGo + Wikipedia   ║\n╚═══════════════════════════════════════╝\n```';
+    if(/^\/(about|info|tentang)$/i.test(t))return'```\n╔═══════════════════════════════════════╗\n║  AI Hacker HOLO v6.3                 ║\n║  ─────────────────────────────────── ║\n║  Neural Engine — Auto Search        ║\n║  Code Generator (10+ languages)     ║\n║  URL Fetcher (CORS Proxy)           ║\n║  Multi-language (14 languages)      ║\n║  No external AI API                 ║\n║  Powered by DuckDuckGo + Wikipedia  ║\n╚═══════════════════════════════════════╝\n```';
 
     // Calculator
     if(this.isCalc(t)){
-      const e=t.replace(/^(hitung|calc|kalkulasi|calculate)\s+/i,'').replace(/[^0-9+\-*/().\s]/g,'');
-      try{return`📊 Hasil: **${Function('"use strict";return('+e+')')()}**`}catch(_){return'❌ Ekspresi tidak valid. Contoh: hitung 2+2*3'}
+      try{
+        const e=t.replace(/^(hitung|calc|kalkulasi|calculate)\s+/i,'').replace(/[^0-9+\-*/().\s]/g,'');
+        if(!e)return'❌ Ekspresi tidak valid';
+        return`📊 Hasil: **${Function('"use strict";return('+e+')')()}**`;
+      }catch(_){return'❌ Ekspresi tidak valid'}
     }
 
     // URL Fetch
@@ -495,176 +472,88 @@ const Brain={
     if(this.isCode(t)){
       const cl=this.detectLang(t)||'html';
       const code=this.genCode(cl,t);
-      return`💻 **${cl.toUpperCase()} Code — AI Hacker HOLO**\n\n\`\`\`\n${code}\n\`\`\`\n\n_Salin atau minta modifikasi lagi!_`;
+      return`💻 **${cl.toUpperCase()} Code — AI Hacker HOLO**\n\n\`\`\`\n${code}\n\`\`\`\n\n_Salin atau minta modifikasi!_`;
     }
 
-    // Question → auto search
-    if(this.isQ(t)||/(?:apa itu|what is|who is|pengertian|definisi|sejarah|cara|tutorial|panduan|belajar|perbedaan|fungsi|manfaat|contoh|download|install|pengertian|penggunaan|informasi|pengetahuan|materi|topik|bahasan|arti|makna|maksud|tujuan|penjelasan|uraian|deskripsi|pembahasan|implementasi|aplikasi|penerapan|kelebihan|kekurangan|jenis|macam|alasan|latar belakang|dampak|pengaruh|hubungan|perbandingan|analogi|ilustrasi|gambaran|ringkasan|kesimpulan)/i.test(t)){
+    // Auto-search for questions
+    if(this.isQ(t)){
       return{special:'search',query:t.substring(0,150),lang:l,auto:true};
     }
 
-    // ===== CHAT RESPONSES — PENGETAHUAN LUAS =====
+    // ===== CHAT RESPONSES =====
     const id={
-      greetings:[
-        'Halo! Gue **AI Hacker HOLO** 🌀 Otak neural v6.2 — bisa searching, coding, multi-bahasa! Tanya apa aja, gas!',
-        'Hey! Selamat datang di **AI Hacker HOLO**. Lo bisa tanya apa aja, suruh buat kode, atau cari info. Semua tanpa API AI lain!',
-        'Halo! Sistem neural aktif. Gue paham 14 bahasa, bisa search Google + Wikipedia, generate kode 10+ bahasa. Coba aja!',
-        'Yo! **AI Hacker HOLO** siap bantu. Tanya soal hacking, coding, sains, teknologi, sejarah — atau minta dibuatin kode!'
-      ],
-      name:[
-        'Gue **AI Hacker HOLO** — AI neural multi-bahasa buatan developer cybersecurity. Bisa search, coding, fetch URL, ngobrol pinter! 🧠',
-        'Panggil **AI Hacker HOLO**. v6.2 — engine canggih tanpa OpenAI, tanpa Google AI. Murni JS + DuckDuckGo + Wikipedia!'
-      ],
-      ability:[
-        'Kemampuan gue:\n🌐 **14 bahasa** — deteksi & jawab sesuai bahasa lo\n🔍 **Auto Search** — tanya apa aja, gue cari dari DuckDuckGo + Wikipedia\n💻 **10+ bahasa coding** — HTML, CSS, JS, Python, PHP, SQL, Go, Rust, Java, C++\n🔗 **URL Fetcher** — ambil konten dari link\n🧮 **Kalkulator** — hitung ekspresi matematika\n🧠 **Pengetahuan luas** — hacking, cybersecurity, programming, sains, teknologi, sejarah, budaya'
-      ],
-      creator:[
-        'Gue diciptain oleh developer cybersecurity pake **JavaScript murni** + DuckDuckGo API + Wikipedia API + CORS Proxy. **No OpenAI, no Google AI, no API AI lain!**',
-        'Dibuat dari nol pake vanilla JS. Otak gue adalah algoritma pencocokan intent + pencarian online. Bukan LLM — tapi tetep pinter!'
-      ],
+      greetings:['Halo! Gue **AI Hacker HOLO** 🌀 Otak neural v6.3 — bisa searching, coding, multi-bahasa! Tanya apa aja, gas!','Hey! **AI Hacker HOLO** siap bantu. Lo bisa tanya apa aja, suruh buat kode, atau cari info. Semua tanpa API AI lain!','Halo! Sistem neural aktif. Paham 14 bahasa, bisa search DuckDuckGo + Wikipedia, generate kode 10+ bahasa!'],
+      name:['Gue **AI Hacker HOLO** — AI neural multi-bahasa buatan developer cybersecurity. Bisa search, coding, fetch URL, ngobrol pinter! 🧠','Panggil **AI Hacker HOLO**. v6.3 — engine canggih tanpa OpenAI, tanpa Google AI. Murni JS + DuckDuckGo + Wikipedia!'],
+      ability:['Kemampuan gue:\n🌐 **14 bahasa** — deteksi & jawab sesuai bahasa lo\n🔍 **Auto Search** — tanya apa aja, gue cari dari DuckDuckGo + Wikipedia\n💻 **10+ bahasa coding** — HTML, CSS, JS, Python, PHP, SQL, Go, Rust, Java, C++\n🔗 **URL Fetcher** — ambil konten dari link\n🧮 **Kalkulator** — hitung ekspresi matematika\n🧠 **Pengetahuan luas** — hacking, cybersecurity, programming, sains, teknologi, sejarah'],
+      creator:['Gue diciptain oleh developer cybersecurity pake **JavaScript murni** + DuckDuckGo API + Wikipedia API + CORS Proxy. **No OpenAI, no Google AI, no API AI lain!**','Dibuat dari nol pake vanilla JS. Otak gue algoritma pencocokan intent + pencarian online. Bukan LLM — tapi tetep pinter!'],
       thanks:['Sama-sama! Jangan lupa matiin jejak digital lo 🔥','Beres! Kalau ada yang perlu dicari atau dibikinin, tag aja!','No problem! Itu mah masih enteng buat **AI Hacker HOLO** 😎'],
       bye:['Sampai jumpa! Tutup port yang kebuka ya 😉','Dadah! Stay safe di dunia maya!','Bye! Jangan lupa update security system lo 🔒'],
-      hacking:[
-        '**Hacking etis** itu ilmu yang luas! Mulai dari **Reconnaissance** (pengumpulan info), **Scanning** (nmap, masscan), **Exploitation** (SQLi, XSS, RCE), sampe **Post-Exploitation**. Mau bahas yang mana?',
-        'Bicara soal hacking: gue tau **SQL Injection**, **Cross-Site Scripting (XSS)**, **Remote Code Execution (RCE)**, **Privilege Escalation**, **Buffer Overflow**, **Phishing**, **Social Engineering**, **Reverse Engineering**, **Forensics**, **Malware Analysis** — tanya aja!',
-        'Tools hacking yang wajib lo kuasai: **Nmap** (scanning), **SQLMap** (SQLi), **Metasploit** (exploit framework), **Burp Suite** (web proxy), **Wireshark** (packet analysis), **John/Hashcat** (password cracking), **Gobuster** (directory busting).',
-        'Prinsip dasar **ethical hacking**:\n1. Dapat izin tertulis\n2. Tentukan scope\n3. Report semua temuan\n4. Jangan rusak data\n5. Jaga kerahasiaan'
-      ],
-      programming:[
-        'Gue kuasai **10+ bahasa pemrograman**: HTML, CSS, JavaScript, Python, PHP, SQL, Go, Rust, Java, C++. Mau belajar atau minta dibuatin kode?',
-        '**Programming fundamental**: variable, data types, loops, conditional, function, OOP, async/await, error handling. Pokoknya dari dasar sampe advanced!',
-        '**Best practices**: selalu validasi input, prepared statements buat SQL, sanitasi output buat XSS, jangan hardcode credentials, pake environment variables!'
-      ],
-      network:[
-        '**Jaringan komputer**: IP addressing (IPv4 & IPv6), subnetting, DNS, TCP/UDP, HTTP/HTTPS, firewall, routing, switching, VLAN, VPN, proxy, load balancer. Tanya spesifik!',
-        'Buat **network reconnaissance**: pake **Nmap** buat port scanning, **traceroute** buat mapping jaringan, **whois** buat informasi domain, **dig/nslookup** buat DNS enumeration.'
-      ],
-      linux:[
-        '**Linux** — rumah para hacker! Distribusi favorit: **Kali Linux** (pentest), **Ubuntu** (general), **Debian** (stable), **Arch** (DIY). Gue paham bash scripting, privilege escalation, file system, process management, network configuration.',
-        'Perintah Linux dasar:\n`ls -la` — lihat file\n`chmod 755 file` — ubah permission\n`grep -r "teks" .` — cari teks\n`ps aux` — lihat proses\n`netstat -tulpn` — lihat port yang terbuka\n`ssh user@host` — remote server'
-      ],
-      crypto:[
-        '**Kriptografi**: **AES** (enkripsi simetris), **RSA** (asimetris), **MD5/SHA** (hashing), **Base64** (encoding), **XOR Cipher**, **Caesar Cipher**, **Vigenère Cipher**, **Diffie-Hellman** key exchange.',
-        'Perbedaan **hash** vs **enkripsi**:\n🔹 Hash — satu arah, irreversible, panjang tetap\n🔹 Enkripsi — dua arah, bisa didekrip pake kunci\nJangan pernah nyimpen password pake enkripsi! Pake hash + salt!'
-      ],
-      tools:[
-        'Tools cybersecurity favorit gue:\n🔹 **Nmap** — port scanner\n🔹 **SQLMap** — SQL injection auto\n🔹 **Metasploit** — exploit framework\n🔹 **Burp Suite** — web proxy\n🔹 **Wireshark** — packet analyzer\n🔹 **John/Hashcat** — password cracking\n🔹 **Gobuster** — directory fuzzing\n🔹 **Netcat** — networking Swiss army knife\n🔹 **Aircrack-ng** — WiFi auditing\n🔹 **Bettercap** — MITM framework'
-      ],
-      science:[
-        '**Sains & teknologi**: gue paham konsep **AI/ML**, **blockchain**, **cloud computing** (AWS, GCP, Azure), **cybersecurity**, **IoT**, **big data**, **quantum computing** (dasar), **computer networks**, **operating systems**, **database systems**, **algorithms**, **data structures**.'
-      ],
-      general:[
-        'Hmm, menarik! Coba tanya sesuatu seperti "apa itu ransomware?" atau "buatkan html button keren" 🔥',
-        'Gue denger lo. Biar lebih mantep, coba: tanya apa aja (auto search), "buatkan kode python scanner", atau "buka https://..."',
-        'Masih kurang jelas nih. Coba deh: "siapa presiden Indonesia?" (auto search), "buatkan html form login", atau "hitung 512*8"'
-      ]
+      hacking:['**Hacking etis** itu ilmu luas! Mulai dari **Reconnaissance**, **Scanning** (Nmap), **Exploitation** (SQLi, XSS, RCE), **Post-Exploitation**, **Privilege Escalation**. Mau bahas yang mana?','Gue tau **SQL Injection**, **XSS**, **RCE**, **Buffer Overflow**, **Phishing**, **Social Engineering**, **Reverse Engineering**, **Malware Analysis**, **Forensics** — tanya aja!','Tools wajib: **Nmap**, **SQLMap**, **Metasploit**, **Burp Suite**, **Wireshark**, **John/Hashcat**, **Gobuster**.\nPrinsip: dapat izin, tentukan scope, report temuan, jangan rusak data.'],
+      programming:['Gue kuasai **10+ bahasa**: HTML, CSS, JavaScript, Python, PHP, SQL, Go, Rust, Java, C++. Mau belajar atau minta dibuatin kode?','**Fundamental**: variable, loops, conditional, function, OOP, async/await, error handling. Dari dasar sampe advanced!','**Best practices**: validasi input, prepared statements buat SQL, sanitasi output, jangan hardcode credentials, pake env variables!'],
+      network:['**Jaringan**: IP addressing, subnetting, DNS, TCP/UDP, HTTP/HTTPS, firewall, routing, switching, VLAN, VPN, proxy, load balancer. Tanya spesifik!','Buat network recon pake **Nmap**, **traceroute**, **whois**, **dig/nslookup**.'],
+      linux:['**Linux** — rumah hacker! **Kali Linux** (pentest), **Ubuntu**, **Debian**, **Arch**. Paham bash scripting, privilege escalation, file system, process management, network config.','Perintah dasar:\n`ls -la`, `chmod`, `grep`, `ps aux`, `netstat -tulpn`, `ssh user@host`.'],
+      crypto:['**Kriptografi**: **AES** (simetris), **RSA** (asimetris), **MD5/SHA** (hashing), **Base64** (encoding), **XOR Cipher**, **Caesar Cipher**, **Vigenère**, **Diffie-Hellman**.','Hash ≠ Enkripsi!\n🔹 Hash — satu arah, irreversible\n🔹 Enkripsi — dua arah, bisa didekrip\nJangan simpan password pake enkripsi! Pake hash + salt!'],
+      tools:['Tools favorit:\n🔹 **Nmap** — port scanner\n🔹 **SQLMap** — SQL injection\n🔹 **Metasploit** — exploit framework\n🔹 **Burp Suite** — web proxy\n🔹 **Wireshark** — packet analyzer\n🔹 **John/Hashcat** — password cracking\n🔹 **Gobuster** — directory fuzzing\n🔹 **Netcat** — networking Swiss army knife\n🔹 **Aircrack-ng** — WiFi auditing\n🔹 **Bettercap** — MITM framework'],
+      science:['**Sains & teknologi**: AI/ML, blockchain, cloud computing (AWS, GCP, Azure), cybersecurity, IoT, big data, quantum computing, computer networks, OS, database, algoritma, struktur data.'],
+      general:['Hmm, menarik! Coba tanya sesuatu seperti "apa itu ransomware?" atau "buatkan html button keren" 🔥','Gue denger lo. Coba: tanya apa aja (auto search), "buatkan kode python scanner", atau "buka https://..."','Masih kurang jelas nih. Coba deh: "siapa presiden Indonesia?" (auto search), "buatkan html form login", atau "hitung 512*8"']
     };
-
     const en={
-      greetings:[
-        'Hello! I\'m **AI Hacker HOLO** 🌀 Neural engine v6.2 — search, code gen, multi-language! Ask me anything!',
-        'Hey! Welcome to **AI Hacker HOLO**. Ask questions, generate code, search the web. All without external AI APIs!',
-        'Neural system online! I understand 14 languages, search DuckDuckGo + Wikipedia, generate 10+ programming languages. Try me!'
-      ],
-      name:['I\'m **AI Hacker HOLO** — multi-language neural AI built by a cybersecurity dev. Search, code, fetch, chat! 🧠'],
-      ability:['My capabilities:\n🌐 **14 languages**\n🔍 **Auto Search** (DuckDuckGo + Wikipedia)\n💻 **10+ code languages** — HTML, CSS, JS, Python, PHP, SQL, Go, Rust, Java, C++\n🔗 **URL Fetcher**\n🧮 **Calculator**\n🧠 **Knowledge** — cybersecurity, programming, science, history, tech'],
-      creator:['I was created by a cybersecurity developer using **pure JavaScript** + DuckDuckGo API + Wikipedia API + CORS Proxy. **No OpenAI, no Google AI!**'],
+      greetings:['Hello! I\'m **AI Hacker HOLO** 🌀 Neural engine v6.3 — search, code gen, multi-language! Ask anything!','Neural system online! 14 languages, DuckDuckGo + Wikipedia search, 10+ code languages. Try me!'],
+      name:['I\'m **AI Hacker HOLO** — multi-language neural AI by a cybersecurity dev. Search, code, fetch, chat! 🧠'],
+      ability:['Capabilities:\n🌐 **14 languages**\n🔍 **Auto Search** (DuckDuckGo + Wikipedia)\n💻 **10+ code languages**\n🔗 **URL Fetcher**\n🧮 **Calculator**\n🧠 **Knowledge**: cybersecurity, programming, science, history'],
+      creator:['Created by a cybersecurity dev using **pure JavaScript** + DuckDuckGo + Wikipedia + CORS Proxy. **No OpenAI, no Google AI!**'],
       thanks:['You\'re welcome! Clear your digital traces 🔥','Anytime! Need something searched or built, just ask!'],
       bye:['Goodbye! Close those open ports 😉','Bye! Stay safe in cyberspace!'],
-      hacking:[
-        '**Ethical hacking** covers: **Reconnaissance**, **Scanning** (Nmap), **Exploitation** (SQLi, XSS, RCE), **Post-Exploitation**, **Privilege Escalation**. What topic?',
-        'I know about: **SQL Injection**, **XSS**, **RCE**, **Buffer Overflow**, **Phishing**, **Social Engineering**, **Reverse Engineering**, **Malware Analysis**, **Forensics** — ask away!'
-      ],
-      programming:[
-        'I support **10+ languages**: HTML, CSS, JavaScript, Python, PHP, SQL, Go, Rust, Java, C++. Want code or lessons?',
-        '**Best practices**: validate input, use prepared statements for SQL, sanitize output, use environment variables, implement proper error handling.'
-      ],
-      general:[
-        'Interesting! Try asking a question (I\'ll auto-search), "make html button", or "fetch https://..." 🔥',
-        'Not quite sure what you mean. Try: "what is ransomware?", "create python port scanner", or "calc 512*8"'
-      ]
+      hacking:['**Ethical hacking**: **Reconnaissance**, **Scanning** (Nmap), **Exploitation** (SQLi, XSS, RCE), **Post-Exploitation**. What topic?','I know: **SQL Injection**, **XSS**, **RCE**, **Buffer Overflow**, **Phishing**, **Social Engineering**, **Reverse Engineering**. Ask away!'],
+      programming:['I support **10+ languages**: HTML, CSS, JS, Python, PHP, SQL, Go, Rust, Java, C++. Want code or lessons?'],
+      general:['Interesting! Try asking a question (auto-search), "make html button", or "fetch https://..." 🔥','Not sure what you mean. Try: "what is ransomware?", "create python scanner", or "calc 512*8"']
     };
+    const zh={greetings:['你好！我是 AI Hacker HOLO 🌀 神经网络v6.3 — 搜索、代码生成、多语言！'],name:['我是 AI Hacker HOLO — 网络安全专家创建的多语言神经AI 🧠'],ability:['我的能力：\n🌐 14种语言\n🔍 自动搜索 (DuckDuckGo + Wikipedia)\n💻 10+编程语言\n🔗 URL获取\n🧮 计算器'],thanks:['不客气！🔥'],bye:['再见！关闭那些开放端口 😉']};
+    const ja={greetings:['こんにちは！AI Hacker HOLO 🌀 ニューラルエンジンv6.3 — 検索、コード生成、多言語！'],name:['AI Hacker HOLOです。サイバーセキュリティ専門家が作った多言語ニューラルAI 🧠'],ability:['私の能力：\n🌐 14言語\n🔍 自動検索\n💻 10+コード言語\n🔗 URL取得\n🧮 計算機'],thanks:['どういたしまして！🔥'],bye:['さようなら！ポートを閉じてね 😉']};
 
-    const zh={
-      greetings:['你好！我是 **AI Hacker HOLO** 🌀 神经网络引擎v6.2 — 搜索、代码生成、多语言！问任何问题！'],
-      name:['我是 **AI Hacker HOLO** — 网络安全专家创建的多语言神经AI 🧠'],
-      ability:['我的能力：\n🌐 **14种语言**\n🔍 **自动搜索** (DuckDuckGo + Wikipedia)\n💻 **10+编程语言** — HTML, CSS, JS, Python, PHP, SQL, Go, Rust, Java, C++\n🔗 **URL获取**\n🧮 **计算器**\n🧠 **知识广泛**'],
-      thanks:['不客气！🔥','随时！需要搜索或构建什么，尽管说！'],
-      bye:['再见！关闭那些开放端口 😉']
-    };
+    const lr={...{id,en,zh,ja}};
+    lr.es={greetings:['¡Hola! Soy AI Hacker HOLO 🌀 Motor neuronal v6.3 — búsqueda, código, multi-idioma!'],name:['Soy AI Hacker HOLO — IA neuronal multilingüe 🧠'],ability:['Capacidades:\n🌐 14 idiomas\n🔍 Búsqueda automática\n💻 10+ lenguajes\n🔗 Obtener URL'],thanks:['¡De nada! 🔥'],bye:['¡Adiós! Cierra esos puertos 😉']};
+    lr.fr={greetings:['Bonjour! Je suis AI Hacker HOLO 🌀 Moteur neuronal v6.3 — recherche, code, multi-langue!'],name:['Je suis AI Hacker HOLO — IA neuronale multilingue 🧠'],ability:['Mes capacités:\n🌐 14 langues\n🔍 Recherche automatique\n💻 10+ langages\n🔗 URL'],thanks:['De rien! 🔥'],bye:['Au revoir! Fermez ces ports 😉']};
+    lr.de={greetings:['Hallo! Ich bin AI Hacker HOLO 🌀 Neuronales Netz v6.3 — Suche, Code, mehrsprachig!'],name:['Ich bin AI Hacker HOLO — mehrsprachige KI 🧠'],ability:['Meine Fähigkeiten:\n🌐 14 Sprachen\n🔍 Automatische Suche\n💻 10+ Codesprachen\n🔗 URL'],thanks:['Gern geschehen! 🔥'],bye:['Tschüss! Schließe diese Ports 😉']};
+    lr.ru={greetings:['Привет! Я AI Hacker HOLO 🌀 Нейросеть v6.3 — поиск, код, мультиязычность!'],name:['Я AI Hacker HOLO — многоязычный нейро-ИИ 🧠'],ability:['Мои возможности:\n🌐 14 языков\n🔍 Автопоиск\n💻 10+ языков кода\n🔗 URL'],thanks:['Пожалуйста! 🔥'],bye:['До свидания! Закройте порты 😉']};
+    lr.ar={greetings:['مرحبًا! أنا AI Hacker HOLO 🌀 محرك عصبي v6.3 — بحث، كود، متعدد اللغات!'],name:['أنا AI Hacker HOLO — ذكاء اصطناعي عصبي 🧠'],ability:['قدراتي:\n🌐 14 لغة\n🔍 بحث تلقائي\n💻 10+ لغات برمجة🔗 جلب URL'],thanks:['عفواً! 🔥'],bye:['وداعاً! أغلق تلك المنافذ 😉']};
+    lr.pt={greetings:['Olá! Sou AI Hacker HOLO 🌀 Motor neural v6.3 — busca, código, multi-idioma!'],name:['Sou AI Hacker HOLO — IA neural multilingue 🧠'],ability:['Capacidades:\n🌐 14 idiomas\n🔍 Busca automática\n💻 10+ linguagens\n🔗 URL'],thanks:['De nada! 🔥'],bye:['Tchau! Feche essas portas 😉']};
+    lr.ko={greetings:['안녕하세요! AI Hacker HOLO 🌀 신경 엔진 v6.3 — 검색, 코드 생성, 다국어!'],name:['AI Hacker HOLO입니다 — 사이버보안 전문가가 만든 다국어 신경 AI 🧠'],ability:['내 능력:\n🌐 14개 언어\n🔍 자동 검색\n💻 10+ 코드 언어\n🔗 URL 가져오기'],thanks:['천만에요! 🔥'],bye:['안녕! 포트 닫아요 😉']};
 
-    const langRes={id,en,zh,ja:{
-      greetings:['こんにちは！**AI Hacker HOLO** 🌀 ニューラルエンジンv6.2 — 検索、コード生成、多言語！'],
-      name:['**AI Hacker HOLO**です。サイバーセキュリティ専門家が作った多言語ニューラルAI 🧠'],
-      ability:['私の能力：\n🌐 **14言語**\n🔍 **自動検索**\n💻 **10+コード言語**\n🔗 **URL取得**\n🧮 **計算機**'],
-      thanks:['どういたしまして！🔥'],
-      bye:['さようなら！ポートを閉じてね 😉']
-    },es:{
-      greetings:['¡Hola! Soy **AI Hacker HOLO** 🌀 Motor neuronal v6.2 — búsqueda, código, multi-idioma!'],
-      name:['Soy **AI Hacker HOLO** — IA neuronal multilingüe creada por un experto en ciberseguridad 🧠'],
-      ability:['Mis capacidades:\n🌐 **14 idiomas**\n🔍 **Búsqueda automática**\n💻 **10+ lenguajes**\n🔗 **Obtener URL**\n🧮 **Calculadora**'],
-      thanks:['¡De nada! 🔥'],bye:['¡Adiós! Cierra esos puertos 😉']
-    },fr:{
-      greetings:['Bonjour! Je suis **AI Hacker HOLO** 🌀 Moteur neuronal v6.2 — recherche, code, multi-langue!'],
-      name:['Je suis **AI Hacker HOLO** — IA neuronale multilingue créée par un expert en cybersécurité 🧠'],
-      ability:['Mes capacités:\n🌐 **14 langues**\n🔍 **Recherche automatique**\n💻 **10+ langages**\n🔗 **Récupérer URL**\n🧮 **Calculatrice**'],
-      thanks:['De rien! 🔥'],bye:['Au revoir! Fermez ces ports 😉']
-    },de:{
-      greetings:['Hallo! Ich bin **AI Hacker HOLO** 🌀 Neuronales Netz v6.2 — Suche, Code, mehrsprachig!'],
-      name:['Ich bin **AI Hacker HOLO** — mehrsprachige neuronale KI von einem Cybersicherheitsexperten 🧠'],
-      ability:['Meine Fähigkeiten:\n🌐 **14 Sprachen**\n🔍 **Automatische Suche**\n💻 **10+ Codesprachen**\n🔗 **URL abrufen**\n🧮 **Taschenrechner**'],
-      thanks:['Gern geschehen! 🔥'],bye:['Tschüss! Schließe diese offenen Ports 😉']
-    },ru:{
-      greetings:['Привет! Я **AI Hacker HOLO** 🌀 Нейросеть v6.2 — поиск, код, мультиязычность!'],
-      name:['Я **AI Hacker HOLO** — многоязычный нейро-ИИ от эксперта по кибербезопасности 🧠'],
-      ability:['Мои возможности:\n🌐 **14 языков**\n🔍 **Автопоиск**\n💻 **10+ языков кода**\n🔗 **Получение URL**\n🧮 **Калькулятор**'],
-      thanks:['Пожалуйста! 🔥'],bye:['До свидания! Закройте открытые порты 😉']
-    },ar:{
-      greetings:['مرحبًا! أنا **AI Hacker HOLO** 🌀 محرك عصبي v6.2 — بحث، كود، متعدد اللغات!'],
-      name:['أنا **AI Hacker HOLO** — ذكاء اصطناعي عصبي متعدد اللغات من خبير أمن سيبراني 🧠'],
-      ability:['قدراتي:\n🌐 **14 لغة**\n🔍 **بحث تلقائي**\n💻 **10+ لغات برمجة**\n🔗 **جلب URL**\n🧮 **آلة حاسبة**'],
-      thanks:['عفواً! 🔥'],bye:['وداعاً! أغلق تلك المنافذ المفتوحة 😉']
-    },pt:{
-      greetings:['Olá! Sou **AI Hacker HOLO** 🌀 Motor neural v6.2 — busca, código, multi-idioma!'],
-      name:['Sou **AI Hacker HOLO** — IA neural multilíngue criada por um especialista em cibersegurança 🧠'],
-      ability:['Minhas capacidades:\n🌐 **14 idiomas**\n🔍 **Busca automática**\n💻 **10+ linguagens**\n🔗 **Buscar URL**\n🧮 **Calculadora**'],
-      thanks:['De nada! 🔥'],bye:['Tchau! Feche essas portas abertas 😉']
-    },ko:{
-      greetings:['안녕하세요! **AI Hacker HOLO** 🌀 신경 엔진 v6.2 — 검색, 코드 생성, 다국어!'],
-      name:['저는 **AI Hacker HOLO**입니다 — 사이버보안 전문가가 만든 다국어 신경 AI 🧠'],
-      ability:['내 능력:\n🌐 **14개 언어**\n🔍 **자동 검색**\n💻 **10+ 코드 언어**\n🔗 **URL 가져오기**\n🧮 **계산기**'],
-      thanks:['천만에요! 🔥'],bye:['안녕! 포트 닫아요 😉']
-    }};
+    const rl=lr[l]||lr['en'];
+    if(/(?:halo|hai|hey|helo|hy|hallo|hi|hello|你好|こんにち|hola|bonjour|hallo|olá|안녕|مرحبا|привет|selamat|siang|pagi|malam|assayammualaikum|wassalam)/i.test(t))
+      return Array.isArray(rl.greetings)?rl.greetings[Math.floor(Math.random()*rl.greetings.length)]:rl.greetings;
+    if(/(?:siapa|nama|who are you|your name|namamu|你叫|あなたは|quién eres|qui es-tu|wer bist du|quem é|como te llamas|как тебя зовут|كيف اسمك|이름이 뭐야)/i.test(t))
+      return Array.isArray(rl.name)?rl.name[Math.floor(Math.random()*rl.name.length)]:rl.name;
+    if(/(?:bisa apa|kemampuan|what can you|kamu bisa|could you|can you|what do you do|what are you|能力|何ができる|que puedes|que tu peux|was kannst du|что ты умеешь|ماذا تستطيع|뭐 할 수 있어)/i.test(t))
+      return rl.ability||rl.greetings;
+    if(/(?:siapa pembuat|who created|who made|pencipta|who built|siapa yang bikin|谁创造了你|誰が作った|quién te creó|qui t'a créé|wer hat dich gemacht|кто тебя создал|من صنعك|누가 만들었어)/i.test(t))
+      return rl.creator||rl.name;
+    if(/(?:hack|hacking|hacker|exploit|inject|sqli|xss|malware|virus|cyber|security|pentest|bug bounty|bugbounty)/i.test(t))
+      return lr['id']?.hacking?lr['id'].hacking[Math.floor(Math.random()*lr['id'].hacking.length)]:(lr['en']?.hacking?lr['en'].hacking[0]:rl.greetings);
+    if(/(?:coding|programming|program|code|kode|pemrograman|developer|software)/i.test(t))
+      return lr['id']?.programming?lr['id'].programming[Math.floor(Math.random()*lr['id'].programming.length)]:(lr['en']?.programming?lr['en'].programming[0]:rl.greetings);
+    if(/(?:network|jaringan|ip|dns|http|tcp|udp|firewall|router|switch)/i.test(t))
+      return lr['id']?.network?lr['id'].network[Math.floor(Math.random()*lr['id'].network.length)]:rl.greetings;
+    if(/(?:linux|kali|ubuntu|debian|bash|terminal|shell)/i.test(t))
+      return lr['id']?.linux?lr['id'].linux[Math.floor(Math.random()*lr['id'].linux.length)]:rl.greetings;
+    if(/(?:crypto|encrypt|decrypt|hash|md5|sha|aes|rsa|base64|cipher)/i.test(t))
+      return lr['id']?.crypto?lr['id'].crypto[Math.floor(Math.random()*lr['id'].crypto.length)]:rl.greetings;
+    if(/(?:tools|tool|nmap|sqlmap|metasploit|burp|wireshark)/i.test(t))
+      return lr['id']?.tools?lr['id'].tools[Math.floor(Math.random()*lr['id'].tools.length)]:rl.greetings;
+    if(/(?:sains|science|fisika|physics|kimia|chemistry|biologi|biology|teknologi|technology)/i.test(t))
+      return lr['id']?.science?lr['id'].science[0]:rl.greetings;
+    if(/(?:makasih|terima kasih|thanks|thank you|谢谢|ありがとう|gracias|merci|danke|obrigado|спасибо|شكرا|감사합니다)/i.test(t))
+      return Array.isArray(rl.thanks)?rl.thanks[Math.floor(Math.random()*rl.thanks.length)]:'You\'re welcome! 🔥';
+    if(/(?:bye|dadah|selamat tinggal|sampai jumpa|goodbye|再见|さようなら|adiós|au revoir|auf wiedersehen|tchau|до свидания|مع السلامة|안녕|daah|met bobo|tidur)/i.test(t))
+      return Array.isArray(rl.bye)?rl.bye[Math.floor(Math.random()*rl.bye.length)]:'Goodbye! 😉';
 
-    // Detect intent for chat
-    const lr=langRes[l]||langRes['en'];
-    if(/(?:halo|hai|hey|helo|hy|hallo|hi|hello|你好|こんにち|hola|bonjour|hallo|olá|안녕|مرحبا|привет|selamat|siang|pagi|malam)/i.test(t))return lr.greetings[Math.floor(Math.random()*lr.greetings.length)];
-    if(/(?:siapa|nama|who are you|your name|namamu|你叫|あなたは|quién eres|qui es-tu|wer bist du|quem é|como te llamas|como se chama|как тебя зовут|كيف اسمك|이름이 뭐야)/i.test(t))return lr.name[Math.floor(Math.random()*lr.name.length)];
-    if(/(?:bisa apa|kemampuan|what can you|kamu bisa|could you|can you|what do you do|what are you|what can u|能力|何ができる|que puedes|que tu peux|qu'est-ce que|was kannst du|что ты умеешь|ماذا تستطيع|뭐 할 수 있어)/i.test(t))return lr.ability||lr.general[0];
-    if(/(?:siapa pembuat|who created|who made|pencipta|who built|siapa yang bikin|谁创造了你|誰が作った|quién te creó|qui t'a créé|wer hat dich gemacht|кто тебя создал|من صنعك|누가 만들었어)/i.test(t))return lr.creator||lr.name[0];
-
-    // Topic-specific
-    if(/(?:hack|hacking|hacker|exploit|inject|sqli|xss|malware|virus|cyber|security|pentest|penetration|bug bounty|bugbounty)/i.test(t))return langRes[l]?.hacking?langRes[l].hacking[Math.floor(Math.random()*langRes[l].hacking.length)]:(langRes['en']?.['hacking']?langRes['en'].hacking[0]:lr.general[0]);
-    if(/(?:coding|programming|program|code|kode|pemrograman|developer|software|应用|程序|プログラミング|programación|programação|programmierung|программирование|برمجة|프로그래밍)/i.test(t))return langRes[l]?.programming?langRes[l].programming[Math.floor(Math.random()*langRes[l].programming.length)]:(langRes['en']?.programming?langRes['en'].programming[0]:lr.general[0]);
-    if(/(?:network|jaringan|ip|dns|http|tcp|udp|firewall|router|switch)/i.test(t))return langRes[l]?.network?langRes[l].network[Math.floor(Math.random()*langRes[l].network.length)]:(langRes['en']?.network?langRes['en'].network[0]:lr.general[0]);
-    if(/(?:linux|kali|ubuntu|debian|bash|terminal|shell|command line|cli)/i.test(t))return langRes[l]?.linux?langRes[l].linux[Math.floor(Math.random()*langRes[l].linux.length)]:(langRes['en']?.linux?langRes['en'].linux[0]:lr.general[0]);
-    if(/(?:crypto|encrypt|decrypt|hash|md5|sha|aes|rsa|base64|cipher|cryptography|kriptografi|enkripsi|deskripsi)/i.test(t))return langRes[l]?.crypto?langRes[l].crypto[Math.floor(Math.random()*langRes[l].crypto.length)]:(langRes['en']?.crypto?langRes['en'].crypto[0]:lr.general[0]);
-    if(/(?:tools|tool|nmap|sqlmap|metasploit|burp|wireshark)/i.test(t))return langRes[l]?.tools?langRes[l].tools[Math.floor(Math.random()*langRes[l].tools.length)]:(langRes['en']?.tools?langRes['en'].tools[0]:lr.general[0]);
-    if(/(?:sains|science|fisika|physics|kimia|chemistry|biologi|biology|teknologi|technology|iptek|saintek)/i.test(t))return langRes[l]?.science?langRes[l].science[0]:lr.general[0];
-
-    // Thanks
-    if(/(?:makasih|terima kasih|thanks|thank you|谢谢|ありがとう|gracias|merci|danke|obrigado|спасибо|شكرا|감사합니다|arigato|thankyou|thx)/i.test(t))return lr.thanks?lr.thanks[Math.floor(Math.random()*lr.thanks.length)]:'You\'re welcome! 🔥';
-
-    // Farewell
-    if(/(?:bye|dadah|selamat tinggal|sampai jumpa|goodbye|再见|さようなら|adiós|au revoir|auf wiedersehen|tchau|до свидания|مع السلامة|안녕|daah|met bobo|tidur)/i.test(t))return lr.bye?lr.bye[Math.floor(Math.random()*lr.bye.length)]:'Goodbye! 😉';
-
-    // Fallback
-    const fb=lr.general||langRes['en'].general;
-    return fb[Math.floor(Math.random()*fb.length)];
+    const fb=rl.general||lr['en'].general;
+    return Array.isArray(fb)?fb[Math.floor(Math.random()*fb.length)]:fb;
   }
 };
 
-// HTML code templates
+// ===== HTML Code Templates =====
 function ko(label,template){
   const m={
     html_btn:`<!DOCTYPE html>
@@ -672,71 +561,48 @@ function ko(label,template){
 <head><title>Neon Button</title><style>*{margin:0;padding:0;box-sizing:border-box}body{min-height:100vh;display:flex;align-items:center;justify-content:center;background:#050508;font-family:Arial}.btn{position:relative;padding:18px 48px;font-size:20px;font-weight:700;text-transform:uppercase;letter-spacing:4px;color:#00f0ff;background:transparent;border:2px solid #00f0ff;border-radius:10px;cursor:pointer;transition:all.3s;overflow:hidden}.btn:hover{background:#00f0ff;color:#050508;box-shadow:0 0 60px rgba(0,240,255,0.4);transform:scale(1.06)}.btn::before{content:"";position:absolute;top:-2px;left:-2px;right:-2px;bottom:-2px;background:linear-gradient(45deg,#00f0ff,#f000ff,#00f0ff);border-radius:12px;z-index:-1;opacity:0;transition:opacity.3s}.btn:hover::before{opacity:0.3}</style></head>
 <body><button class="btn">HOVER ME</button></body>
 </html>`,
-
     html_form:`<!DOCTYPE html>
-<html>
-<head><title>Login Form</title><style>*{margin:0;padding:0;box-sizing:border-box}body{min-height:100vh;display:flex;align-items:center;justify-content:center;background:#050508;font-family:Arial}.card{background:rgba(255,255,255,0.02);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(0,240,255,0.08);border-radius:20px;padding:40px;width:380px;box-shadow:0 0 40px rgba(0,240,255,0.03)}h2{color:#00f0ff;text-align:center;margin-bottom:24px;letter-spacing:2px;font-size:22px}input{width:100%;padding:12px 16px;margin-bottom:14px;background:rgba(0,240,255,0.02);border:1px solid rgba(0,240,255,0.06);border-radius:10px;color:#d0e8ff;font-size:14px;outline:none;transition:border.2s}input:focus{border-color:#00f0ff}button{width:100%;padding:12px;background:#00f0ff;border:none;border-radius:10px;color:#050508;font-size:16px;font-weight:700;cursor:pointer;transition:all.2s}button:hover{box-shadow:0 0 40px rgba(0,240,255,0.2);transform:translateY(-2px)}p{color:rgba(255,255,255,0.3);text-align:center;margin-top:12px;font-size:12px}a{color:#00f0ff;text-decoration:none}</style></head>
+<html><head><title>Login Form</title><style>*{margin:0;padding:0;box-sizing:border-box}body{min-height:100vh;display:flex;align-items:center;justify-content:center;background:#050508;font-family:Arial}.card{background:rgba(255,255,255,0.02);backdrop-filter:blur(12px);border:1px solid rgba(0,240,255,0.08);border-radius:20px;padding:40px;width:380px}h2{color:#00f0ff;text-align:center;margin-bottom:24px;letter-spacing:2px}input{width:100%;padding:12px 16px;margin-bottom:14px;background:rgba(0,240,255,0.02);border:1px solid rgba(0,240,255,0.06);border-radius:10px;color:#d0e8ff;font-size:14px;outline:none;transition:border.2s}input:focus{border-color:#00f0ff}button{width:100%;padding:12px;background:#00f0ff;border:none;border-radius:10px;color:#050508;font-size:16px;font-weight:700;cursor:pointer}button:hover{box-shadow:0 0 40px rgba(0,240,255,0.2);transform:translateY(-2px)}p{color:rgba(255,255,255,0.3);text-align:center;margin-top:12px;font-size:12px}a{color:#00f0ff;text-decoration:none}</style></head>
 <body><div class="card"><h2>LOGIN</h2><input type="text" placeholder="Username"><input type="password" placeholder="Password"><button>MASUK</button><p>Belum punya akun? <a href="#">Daftar</a></p></div></body>
 </html>`,
-
     html_tbl:`<!DOCTYPE html>
-<html>
-<head><title>Data Table</title><style>*{margin:0;padding:0;box-sizing:border-box}body{min-height:100vh;display:flex;align-items:center;justify-content:center;background:#050508;font-family:Arial;padding:20px}.container{width:800px;max-width:100%}table{border-collapse:collapse;width:100%;color:#d0e8ff;border:1px solid rgba(0,240,255,0.06);border-radius:12px;overflow:hidden}th{background:rgba(0,240,255,0.06);color:#00f0ff;padding:14px 16px;text-align:left;font-size:13px;letter-spacing:1px;border-bottom:1px solid rgba(0,240,255,0.1)}td{padding:12px 16px;border-bottom:1px solid rgba(0,240,255,0.03);font-size:13px}tr:hover td{background:rgba(0,240,255,0.02)}.badge{display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px}.badge.on{background:rgba(0,255,65,0.1);color:var(--green)}.badge.off{background:rgba(255,0,0,0.1);color:#ff4444}</style></head>
-<body><div class="container"><table><thead><tr><th>No</th><th>Nama</th><th>IP Address</th><th>Status</th><th>Port</th></tr></thead><tbody><tr><td>1</td><td>AI Hacker Server</td><td>192.168.1.42</td><td><span class="badge on">Online</span></td><td>80, 443</td></tr><tr><td>2</td><td>Firewall</td><td>192.168.1.1</td><td><span class="badge on">Active</span></td><td>22</td></tr><tr><td>3</td><td>Web App</td><td>10.0.0.7</td><td><span class="badge on">Running</span></td><td>8080</td></tr><tr><td>4</td><td>Database</td><td>10.0.0.15</td><td><span class="badge off">Down</span></td><td>3306</td></tr><tr><td>5</td><td>DNS Server</td><td>10.0.0.2</td><td><span class="badge on">Online</span></td><td>53</td></tr></tbody></table></div></body>
+<html><head><title>Data Table</title><style>*{margin:0;padding:0;box-sizing:border-box}body{min-height:100vh;display:flex;align-items:center;justify-content:center;background:#050508;font-family:Arial;padding:20px}table{border-collapse:collapse;width:800px;color:#d0e8ff;border:1px solid rgba(0,240,255,0.06);border-radius:12px;overflow:hidden}th{background:rgba(0,240,255,0.06);color:#00f0ff;padding:14px 16px;text-align:left;border-bottom:1px solid rgba(0,240,255,0.1)}td{padding:12px 16px;border-bottom:1px solid rgba(0,240,255,0.03)}tr:hover td{background:rgba(0,240,255,0.02)}.badge{display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px}.badge.on{background:rgba(0,255,65,0.1);color:#00ff41}.badge.off{background:rgba(255,0,0,0.1);color:#ff4444}</style></head>
+<body><table><thead><tr><th>No</th><th>Nama</th><th>IP Address</th><th>Status</th><th>Port</th></tr></thead><tbody><tr><td>1</td><td>AI Hacker Server</td><td>192.168.1.42</td><td><span class="badge on">Online</span></td><td>80, 443</td></tr><tr><td>2</td><td>Firewall</td><td>192.168.1.1</td><td><span class="badge on">Active</span></td><td>22</td></tr><tr><td>3</td><td>Web App</td><td>10.0.0.7</td><td><span class="badge on">Running</span></td><td>8080</td></tr><tr><td>4</td><td>Database</td><td>10.0.0.15</td><td><span class="badge off">Down</span></td><td>3306</td></tr><tr><td>5</td><td>DNS Server</td><td>10.0.0.2</td><td><span class="badge on">Online</span></td><td>53</td></tr></tbody></table></body>
 </html>`,
-
     html_nav:`<!DOCTYPE html>
-<html>
-<head><title>Navbar</title><style>*{margin:0;padding:0;box-sizing:border-box}body{background:#050508;font-family:Arial}nav{display:flex;align-items:center;justify-content:space-between;padding:14px 40px;background:rgba(0,240,255,0.02);border-bottom:1px solid rgba(0,240,255,0.06)}.logo{color:#00f0ff;font-size:18px;font-weight:700;letter-spacing:2px;font-family:monospace}nav a{color:rgba(255,255,255,0.5);text-decoration:none;margin-left:28px;font-size:13px;transition:color.2s;letter-spacing:1px}nav a:hover{color:#00f0ff}nav a.active{color:#00f0ff}</style></head>
+<html><head><title>Navbar</title><style>*{margin:0;padding:0;box-sizing:border-box}body{background:#050508;font-family:Arial}nav{display:flex;align-items:center;justify-content:space-between;padding:14px 40px;background:rgba(0,240,255,0.02);border-bottom:1px solid rgba(0,240,255,0.06)}.logo{color:#00f0ff;font-size:18px;font-weight:700;letter-spacing:2px;font-family:monospace}nav a{color:rgba(255,255,255,0.5);text-decoration:none;margin-left:28px;font-size:13px;transition:color.2s}nav a:hover,nav a.active{color:#00f0ff}</style></head>
 <body><nav><div class="logo">AI HACKER</div><div><a href="#" class="active">Home</a><a href="#">Services</a><a href="#">Tools</a><a href="#">Docs</a><a href="#">Contact</a></div></nav></body>
 </html>`,
-
     html_part:`<!DOCTYPE html>
-<html>
-<head><title>Particle Animation</title><style>*{margin:0;padding:0;box-sizing:border-box}canvas{display:block;position:fixed;top:0;left:0;z-index:0}body{background:#050508;overflow:hidden}.overlay{position:fixed;z-index:1;bottom:40px;left:50%;transform:translateX(-50%);color:rgba(0,240,255,0.15);font-family:monospace;font-size:12px;letter-spacing:4px;text-align:center}</style></head>
-<body><canvas id="c"></canvas><div class="overlay">AI HACKER HOLO</div>
-<script>const c=document.getElementById("c"),ctx=c.getContext("2d");let W,H;
-function rs(){W=c.width=innerWidth;H=c.height=innerHeight}rs();addEventListener("resize",rs);
-const pts=Array.from({length:200},()=>({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.5,vy:(Math.random()-.5)*.5,s:Math.random()*2+1,h:Math.floor(Math.random()*360)}));
-function dr(){ctx.fillStyle="rgba(5,5,8,0.12)";ctx.fillRect(0,0,W,H);
-for(const p of pts){p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>W)p.vx*=-1;if(p.y<0||p.y>H)p.vy*=-1;
-ctx.beginPath();ctx.arc(p.x,p.y,p.s,0,Math.PI*2);ctx.fillStyle="hsl("+p.h+",100%,60%)";ctx.fill()}
-for(let i=0;i<pts.length;i++){for(let j=i+1;j<pts.length;j++){const dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y,d=Math.sqrt(dx*dx+dy*dy);if(d<100){ctx.strokeStyle="rgba(0,240,255,"+(1-d/100)*0.15+")";ctx.lineWidth=.5;ctx.beginPath();ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);ctx.stroke()}}}
-requestAnimationFrame(dr)}dr()</script></body>
+<html><head><title>Particle Animation</title><style>*{margin:0;padding:0;box-sizing:border-box}canvas{display:block;position:fixed;top:0;left:0;z-index:0}body{background:#050508;overflow:hidden}.overlay{position:fixed;z-index:1;bottom:40px;left:50%;transform:translateX(-50%);color:rgba(0,240,255,0.15);font-family:monospace;font-size:12px;letter-spacing:4px;text-align:center}</style></head>
+<body><canvas id="c"></canvas><div class="overlay">AI HACKER HOLO</div><script>const c=document.getElementById("c"),ctx=c.getContext("2d");let W,H;const rs=()=>{W=c.width=innerWidth;H=c.height=innerHeight};rs();addEventListener("resize",rs);const pts=Array.from({length:200},()=>({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.5,vy:(Math.random()-.5)*.5,s:Math.random()*2+1,h:Math.floor(Math.random()*360)}));function dr(){ctx.fillStyle="rgba(5,5,8,0.12)";ctx.fillRect(0,0,W,H);for(const p of pts){p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>W)p.vx*=-1;if(p.y<0||p.y>H)p.vy*=-1;ctx.beginPath();ctx.arc(p.x,p.y,p.s,0,Math.PI*2);ctx.fillStyle="hsl("+p.h+",100%,60%)";ctx.fill()}for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++){const dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y,d=Math.sqrt(dx*dx+dy*dy);if(d<100){ctx.strokeStyle="rgba(0,240,255,"+(1-d/100)*0.15+")";ctx.lineWidth=.5;ctx.beginPath();ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);ctx.stroke()}}requestAnimationFrame(dr)}dr()</script></body>
 </html>`,
-
     html_card:`<!DOCTYPE html>
-<html>
-<head><title>Profile Card</title><style>*{margin:0;padding:0;box-sizing:border-box}body{min-height:100vh;display:flex;align-items:center;justify-content:center;background:#050508;font-family:Arial}.card{background:rgba(255,255,255,0.02);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(0,240,255,0.08);border-radius:20px;padding:36px;width:340px;text-align:center;box-shadow:0 0 40px rgba(0,240,255,0.03);transition:all.3s}.card:hover{border-color:rgba(0,240,255,0.2);transform:translateY(-6px);box-shadow:0 0 60px rgba(0,240,255,0.06)}.av{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#00f0ff22,#f000ff22);border:2px solid rgba(0,240,255,0.15);margin:0 auto 16px;display:flex;align-items:center;justify-content:center;font-size:36px}h2{color:#00f0ff;font-size:20px;letter-spacing:2px;margin-bottom:4px}.title{color:rgba(255,255,255,0.3);font-size:12px;margin-bottom:16px}.bio{color:rgba(255,255,255,0.5);font-size:13px;line-height:1.6;margin-bottom:20px}.socials{display:flex;justify-content:center;gap:12px}.socials a{width:36px;height:36px;border-radius:50%;background:rgba(0,240,255,0.04);border:1px solid rgba(0,240,255,0.06);display:flex;align-items:center;justify-content:center;color:rgba(0,240,255,0.4);text-decoration:none;font-size:14px;transition:all.2s}.socials a:hover{background:rgba(0,240,255,0.08);color:#00f0ff}</style></head>
-<body><div class="card"><div class="av">🌀</div><h2>AI HACKER</h2><div class="title">Neural Engine v6.2</div><div class="bio">Multi-language AI dengan kemampuan searching, coding, dan chatting. Dibuat tanpa OpenAI — pure JS!</div><div class="socials"><a href="#">⚡</a><a href="#">🧠</a><a href="#">🔧</a><a href="#">🌐</a></div></div></body>
+<html><head><title>Profile Card</title><style>*{margin:0;padding:0;box-sizing:border-box}body{min-height:100vh;display:flex;align-items:center;justify-content:center;background:#050508;font-family:Arial}.card{background:rgba(255,255,255,0.02);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(0,240,255,0.08);border-radius:20px;padding:36px;width:340px;text-align:center;transition:all.3s}.card:hover{border-color:rgba(0,240,255,0.2);transform:translateY(-6px);box-shadow:0 0 60px rgba(0,240,255,0.06)}.av{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#00f0ff22,#f000ff22);border:2px solid rgba(0,240,255,0.15);margin:0 auto 16px;display:flex;align-items:center;justify-content:center;font-size:36px}h2{color:#00f0ff;font-size:20px;letter-spacing:2px;margin-bottom:4px}.title{color:rgba(255,255,255,0.3);font-size:12px;margin-bottom:16px}.bio{color:rgba(255,255,255,0.5);font-size:13px;line-height:1.6;margin-bottom:20px}.socials{display:flex;justify-content:center;gap:12px}.socials a{width:36px;height:36px;border-radius:50%;background:rgba(0,240,255,0.04);border:1px solid rgba(0,240,255,0.06);display:flex;align-items:center;justify-content:center;color:rgba(0,240,255,0.4);text-decoration:none;transition:all.2s}.socials a:hover{background:rgba(0,240,255,0.08);color:#00f0ff}</style></head>
+<body><div class="card"><div class="av">🌀</div><h2>AI HACKER</h2><div class="title">Neural Engine v6.3</div><div class="bio">Multi-language AI — search, code, chat. No OpenAI, pure JS!</div><div class="socials"><a href="#">⚡</a><a href="#">🧠</a><a href="#">🔧</a><a href="#">🌐</a></div></div></body>
 </html>`,
-
     html_land:`<!DOCTYPE html>
-<html>
-<head><title>AI Hacker — Landing</title><style>*{margin:0;padding:0;box-sizing:border-box}body{min-height:100vh;background:#050508;color:#d0e8ff;font-family:Arial;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px}.glow{font-size:56px;font-weight:900;background:linear-gradient(135deg,#00f0ff,#f000ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:16px;letter-spacing:6px;font-family:monospace}.sub{color:rgba(255,255,255,0.3);font-size:16px;margin-bottom:40px;letter-spacing:2px}.btn-group{display:flex;gap:16px;flex-wrap:wrap;justify-content:center}.btn{padding:14px 36px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;text-decoration:none;letter-spacing:2px;text-transform:uppercase;transition:all.3s}.btn.primary{background:#00f0ff;color:#050508;border:none}.btn.primary:hover{box-shadow:0 0 40px rgba(0,240,255,0.3);transform:translateY(-2px)}.btn.secondary{background:transparent;border:1px solid rgba(0,240,255,0.2);color:#00f0ff}.btn.secondary:hover{background:rgba(0,240,255,0.04);border-color:#00f0ff}.footer{margin-top:60px;color:rgba(255,255,255,0.05);font-size:11px;font-family:monospace;letter-spacing:2px}</style></head>
-<body><div class="glow">AI HACKER</div><div class="sub">Neural Engine v6.2 — Search · Code · Multi-language</div><div class="btn-group"><a href="#" class="btn primary">Get Started</a><a href="#" class="btn secondary">Learn More</a></div><div class="footer">⚡ 100% JavaScript · No OpenAI · No Google AI</div></body>
+<html><head><title>AI Hacker — Landing</title><style>*{margin:0;padding:0;box-sizing:border-box}body{min-height:100vh;background:#050508;color:#d0e8ff;font-family:Arial;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px}.glow{font-size:56px;font-weight:900;background:linear-gradient(135deg,#00f0ff,#f000ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:16px;letter-spacing:6px;font-family:monospace}.sub{color:rgba(255,255,255,0.3);font-size:16px;margin-bottom:40px;letter-spacing:2px}.btn-group{display:flex;gap:16px;flex-wrap:wrap;justify-content:center}.btn{padding:14px 36px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;text-decoration:none;letter-spacing:2px;text-transform:uppercase;transition:all.3s}.btn.primary{background:#00f0ff;color:#050508}.btn.primary:hover{box-shadow:0 0 40px rgba(0,240,255,0.3);transform:translateY(-2px)}.btn.secondary{background:transparent;border:1px solid rgba(0,240,255,0.2);color:#00f0ff}.btn.secondary:hover{background:rgba(0,240,255,0.04)}.footer{margin-top:60px;color:rgba(255,255,255,0.05);font-size:11px;font-family:monospace;letter-spacing:2px}</style></head>
+<body><div class="glow">AI HACKER</div><div class="sub">Neural Engine v6.3 — Search · Code · Multi-language</div><div class="btn-group"><a href="#" class="btn primary">Get Started</a><a href="#" class="btn secondary">Learn More</a></div><div class="footer">⚡ 100% JavaScript · No OpenAI · No Google AI</div></body>
 </html>`,
-
     html_dash:`<!DOCTYPE html>
-<html>
-<head><title>Dashboard</title><style>*{margin:0;padding:0;box-sizing:border-box}body{background:#050508;color:#d0e8ff;font-family:Arial;padding:24px}.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:32px}h1{font-size:20px;color:#00f0ff;letter-spacing:2px;font-family:monospace}.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:32px}.stat{background:rgba(255,255,255,0.015);border:1px solid rgba(0,240,255,0.04);border-radius:12px;padding:20px}.stat .num{font-size:28px;font-weight:700;color:#00f0ff}.stat .label{font-size:11px;color:rgba(255,255,255,0.3);margin-top:4px;letter-spacing:1px}.grid{display:grid;grid-template-columns:2fr 1fr;gap:16px}.card{background:rgba(255,255,255,0.015);border:1px solid rgba(0,240,255,0.04);border-radius:12px;padding:20px}.card h3{font-size:14px;color:#00f0ff;margin-bottom:12px;letter-spacing:1px}table{width:100%;font-size:12px}td{padding:6px 0;border-bottom:1px solid rgba(0,240,255,0.02)}tr:last-child td{border:none}.dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:6px}.dot.g{background:var(--green)}.dot.r{background:#ff4444}.dot.y{background:#ffd700}</style></head>
-<body><div class="header"><h1>◈ DASHBOARD</h1><span style="font-size:11px;color:rgba(255,255,255,0.2)">AI Hacker HOLO v6.2</span></div>
-<div class="stats"><div class="stat"><div class="num">128</div><div class="label">Active Sessions</div></div><div class="stat"><div class="num">7</div><div class="label">Servers Online</div></div><div class="stat"><div class="num">99.9%</div><div class="label">Uptime</div></div><div class="stat"><div class="num">24</div><div class="label">Open Ports</div></div></div>
-<div class="grid"><div class="card"><h3>Recent Activity</h3><table><tr><td><span class="dot g"></span>Port scan completed</td><td>12:04</td></tr><tr><td><span class="dot g"></span>SQLMap injection test</td><td>11:52</td></tr><tr><td><span class="dot y"></span>Firewall rule updated</td><td>10:30</td></tr><tr><td><span class="dot g"></span>Backup completed</td><td>09:15</td></tr></table></div>
-<div class="card"><h3>Quick Actions</h3><div style="display:flex;flex-direction:column;gap:8px"><button style="padding:8px;background:rgba(0,240,255,0.04);border:1px solid rgba(0,240,255,0.06);border-radius:6px;color:#d0e8ff;cursor:pointer;font-size:12px">🔍 Scan Network</button><button style="padding:8px;background:rgba(0,240,255,0.04);border:1px solid rgba(0,240,255,0.06);border-radius:6px;color:#d0e8ff;cursor:pointer;font-size:12px">💻 Run Exploit</button><button style="padding:8px;background:rgba(0,240,255,0.04);border:1px solid rgba(0,240,255,0.06);border-radius:6px;color:#d0e8ff;cursor:pointer;font-size:12px">📊 View Reports</button></div></div></div></body>
+<html><head><title>Dashboard</title><style>*{margin:0;padding:0;box-sizing:border-box}body{background:#050508;color:#d0e8ff;font-family:Arial;padding:24px}.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:32px}h1{font-size:20px;color:#00f0ff;letter-spacing:2px;font-family:monospace}.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:32px}.stat{background:rgba(255,255,255,0.015);border:1px solid rgba(0,240,255,0.04);border-radius:12px;padding:20px}.stat .num{font-size:28px;font-weight:700;color:#00f0ff}.stat .label{font-size:11px;color:rgba(255,255,255,0.3);margin-top:4px;letter-spacing:1px}.grid{display:grid;grid-template-columns:2fr 1fr;gap:16px}.card{background:rgba(255,255,255,0.015);border:1px solid rgba(0,240,255,0.04);border-radius:12px;padding:20px}.card h3{font-size:14px;color:#00f0ff;margin-bottom:12px;letter-spacing:1px}table{width:100%;font-size:12px}td{padding:6px 0;border-bottom:1px solid rgba(0,240,255,0.02)}.dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:6px}.dot.g{background:#00ff41}.dot.r{background:#ff4444}.dot.y{background:#ffd700}</style></head>
+<body><div class="header"><h1>◈ DASHBOARD</h1><span style="color:rgba(255,255,255,0.2);font-size:11px">AI Hacker HOLO v6.3</span></div>
+<div class="stats"><div class="stat"><div class="num">128</div><div class="label">Active Sessions</div></div><div class="stat"><div class="num">7</div><div class="label">Servers</div></div><div class="stat"><div class="num">99.9%</div><div class="label">Uptime</div></div><div class="stat"><div class="num">24</div><div class="label">Open Ports</div></div></div>
+<div class="grid"><div class="card"><h3>Recent Activity</h3><table><tr><td><span class="dot g"></span>Port scan done</td><td>12:04</td></tr><tr><td><span class="dot g"></span>SQLMap test</td><td>11:52</td></tr><tr><td><span class="dot y"></span>Firewall updated</td><td>10:30</td></tr><tr><td><span class="dot g"></span>Backup done</td><td>09:15</td></tr></table></div>
+<div class="card"><h3>Actions</h3><div style="display:flex;flex-direction:column;gap:8px"><button style="padding:8px;background:rgba(0,240,255,0.04);border:1px solid rgba(0,240,255,0.06);border-radius:6px;color:#d0e8ff;cursor:pointer;font-size:12px">🔍 Scan Network</button><button style="padding:8px;background:rgba(0,240,255,0.04);border:1px solid rgba(0,240,255,0.06);border-radius:6px;color:#d0e8ff;cursor:pointer;font-size:12px">💻 Run Exploit</button></div></div></div></body>
 </html>`,
-
     html_def:`<!DOCTYPE html>
 <html lang="id">
 <head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/><title>AI Hacker — Halaman</title><style>*{margin:0;padding:0;box-sizing:border-box}body{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#050508;color:#d0e8ff;font-family:Arial;text-align:center;padding:40px}h1{color:#00f0ff;font-size:36px;letter-spacing:4px;margin-bottom:12px;font-family:monospace}p{color:rgba(255,255,255,0.3);max-width:400px;line-height:1.6;font-size:14px}.line{width:60px;height:2px;background:linear-gradient(90deg,#00f0ff,#f000ff);margin:20px 0;border-radius:2px}</style></head>
-<body><h1>AI HACKER</h1><div class="line"></div><p>Halaman ini dibuat oleh <strong style="color:#00f0ff">AI Hacker HOLO</strong> — Neural Code Generator. Tidak pakai template, murni generate otomatis!</p></body>
+<body><h1>AI HACKER</h1><div class="line"></div><p>Halaman dibuat oleh <strong style="color:#00f0ff">AI Hacker HOLO</strong> — Neural Code Generator v6.3</p></body>
 </html>`
   };
   return m[template]||m.html_def;
 }
 
 // ==================================================================
-// 5. CHAT CONTROLLER
+// 5. CHAT CONTROLLER — FIXED
 // ==================================================================
 (function(){
   const msgs=document.getElementById('msgs');
@@ -744,6 +610,7 @@ requestAnimationFrame(dr)}dr()</script></body>
   const snd=document.getElementById('snd');
   const lngShow=document.getElementById('lngShow');
   let curLang='id';
+  let isProcessing=false;  // Prevent double-send
 
   function sc(){setTimeout(()=>msgs.scrollTop=msgs.scrollHeight,15)}
 
@@ -760,7 +627,7 @@ requestAnimationFrame(dr)}dr()</script></body>
     return h;
   }
 
-  function add(role,content){
+  function addMsg(role,content){
     const d=document.createElement('div');
     d.className=`msg ${role==='ai'?'ai':'us'}`;
     const lb=document.createElement('div');
@@ -770,7 +637,7 @@ requestAnimationFrame(dr)}dr()</script></body>
     if(role==='ai'&&content==='__TY__'){
       const t=document.createElement('span');t.className='ty';
       t.innerHTML='<span></span><span></span><span></span>';b.appendChild(t);
-    }else if(typeof content==='string'){
+    }else{
       b.innerHTML=fmt(content);
     }
     d.appendChild(b);msgs.appendChild(d);sc();return d;
@@ -781,14 +648,13 @@ requestAnimationFrame(dr)}dr()</script></body>
     if(m.length){const l=m[m.length-1];if(l.querySelector('.ty'))l.remove()}
   }
 
-  function addSearch(r,q){
+  function addSearchRes(r,q){
     const d=document.createElement('div');d.className='msg ai';
     const lb=document.createElement('div');lb.className='ml';lb.textContent='AI HACKER HOLO';
     d.appendChild(lb);
     const b=document.createElement('div');b.className='b';
     let h=`<div style="color:var(--cyan);font-weight:600;margin-bottom:5px;font-size:12px">🔍 Hasil: <span style="color:#fff">${esc(q)}</span></div>`;
     let cnt=0;
-
     if(r.ddg&&r.ddg.length){
       for(const x of r.ddg){
         if(cnt>=4)break;
@@ -813,7 +679,7 @@ requestAnimationFrame(dr)}dr()</script></body>
     b.innerHTML=h;d.appendChild(b);msgs.appendChild(d);sc();
   }
 
-  function addURL(r){
+  function addURLRes(r){
     const d=document.createElement('div');d.className='msg ai';
     const lb=document.createElement('div');lb.className='ml';lb.textContent='AI HACKER HOLO';
     d.appendChild(lb);
@@ -829,66 +695,113 @@ requestAnimationFrame(dr)}dr()</script></body>
     d.appendChild(b);msgs.appendChild(d);sc();
   }
 
+  // ===== MAIN SEND / RESPOND =====
   async function respond(txt){
     const dl=Lang.detect(txt);curLang=dl;
     lngShow.textContent=Lang.name(dl);
-    add('ai','__TY__');
-    const res=await Brain.think(txt,dl);
-    setTimeout(async()=>{
+
+    // Show typing indicator
+    addMsg('ai','__TY__');
+
+    try {
+      const res=await Brain.think(txt,dl);
+
+      // Small delay for natural feel
+      await new Promise(r=>setTimeout(r,300+Math.random()*200));
+
       rmTy();
-      if(res==='__CLEAR__'){msgs.innerHTML='';setTimeout(()=>add('ai','Chat dibersihkan! Siap lagi 🔄'),50);return}
+
+      if(res==='__CLEAR__'){
+        msgs.innerHTML='';
+        setTimeout(()=>addMsg('ai','Chat dibersihkan! Siap lagi 🔄'),50);
+        return;
+      }
+
+      // Search result
       if(res&&typeof res==='object'&&res.special==='search'){
         try{
           const sr=await Net.search(res.query,res.lang);
-          rmTy();
-          // Hapus loading message kalo ada
-          addSearch(sr,res.query);
-        }catch(e){rmTy();add('ai','❌ Gagal mencari. Coba lagi.')}
-        return;
-      }
-      if(res&&typeof res==='object'&&res.special==='fetch'){
-        try{
-          const fr=await Net.fetchUrl(res.url);
-          const ms=msgs.querySelectorAll('.msg.ai');
-          if(ms.length){const l=ms[ms.length-1];if(l.textContent.includes('⏳'))l.remove()}
-          addURL(fr);
+          addSearchRes(sr,res.query);
         }catch(e){
-          const ms=msgs.querySelectorAll('.msg.ai');
-          if(ms.length){const l=ms[ms.length-1];if(l.textContent.includes('⏳'))l.remove()}
-          add('ai','❌ Error: '+e.message);
+          addMsg('ai','❌ Gagal mencari. Coba lagi.');
         }
         return;
       }
-      add('ai',res);
-    },400+Math.random()*300);
+
+      // URL fetch
+      if(res&&typeof res==='object'&&res.special==='fetch'){
+        addMsg('ai','⏳ Mengambil URL...');
+        try{
+          const fr=await Net.fetchUrl(res.url);
+          // Remove loading msg
+          const ms=msgs.querySelectorAll('.msg.ai');
+          if(ms.length){const l=ms[ms.length-1];if(l.textContent.includes('⏳'))l.remove()}
+          addURLRes(fr);
+        }catch(e){
+          const ms=msgs.querySelectorAll('.msg.ai');
+          if(ms.length){const l=ms[ms.length-1];if(l.textContent.includes('⏳'))l.remove()}
+          addMsg('ai','❌ Error: '+e.message);
+        }
+        return;
+      }
+
+      // Normal response
+      if(res) addMsg('ai',res);
+
+    } catch(e) {
+      rmTy();
+      addMsg('ai','❌ Terjadi error. Coba lagi ya!');
+      console.error('Brain error:',e);
+    }
   }
 
-  function send(){
-    const t=inp.value.trim();if(!t)return;
-    add('us',t);inp.value='';inp.style.height='auto';
-    respond(t);
+  function sendMsg(){
+    if(isProcessing) return;  // Prevent double-send
+    const t=inp.value.trim();
+    if(!t) return;
+
+    isProcessing=true;
+    addMsg('us',t);
+    inp.value='';
+    inp.style.height='auto';
+
+    respond(t).finally(()=>{isProcessing=false;});
   }
 
-  snd.addEventListener('click',send);
-  inp.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send()}});
-  inp.addEventListener('input',()=>{inp.style.height='auto';inp.style.height=Math.min(inp.scrollHeight,72)+'px'});
+  // ===== EVENT LISTENERS =====
+  snd.addEventListener('click',sendMsg);
 
-  // Welcome
-  setTimeout(()=>{
-    add('ai','🌀 **AI Hacker HOLO v6.2** online! Otak neural super pinter siap bantu lo.\n\n💬 **Tanya apapun** — "apa itu ransomware?" (auto search Google + Wikipedia!)\n💻 **"buatkan html button keren"** — generate kode 10+ bahasa\n🔗 **"buka https://..."** — ambil konten dari link\n🌐 **Multi-bahasa** — Indonesia, English, 中文, 日本語, Español, Français, Deutsch, Русский, العربية, Português, 한국어\n\nKetik `/help` buat panduan lengkap!');
-  },400);
-
-  // 3D mouse tracking — minimal
-  const w=document.getElementById('chatW');
-  document.addEventListener('mousemove',e=>{
-    const r=w.getBoundingClientRect();
-    const dx=(e.clientX-r.left-r.width/2)/r.width,dy=(e.clientY-r.top-r.height/2)/r.height;
-    if(innerWidth>540)w.style.transform=`rotateX(${-dy*3}deg) rotateY(${dx*3}deg) translateZ(20px)`;
+  inp.addEventListener('keydown',function(e){
+    if(e.key==='Enter'&&!e.shiftKey){
+      e.preventDefault();
+      sendMsg();
+    }
   });
-  document.addEventListener('mouseleave',()=>{if(innerWidth>540)w.style.transform='rotateX(1deg) rotateY(-.5deg) translateZ(20px)'});
+
+  inp.addEventListener('input',function(){
+    this.style.height='auto';
+    this.style.height=Math.min(this.scrollHeight,72)+'px';
+  });
+
+  // ===== WELCOME MESSAGE =====
+  setTimeout(()=>{
+    addMsg('ai','🌀 **AI Hacker HOLO v6.3** online! Otak neural super pinter siap bantu lo.\n\n💬 **Tanya apapun** — "apa itu ransomware?" (auto search Google + Wikipedia!)\n💻 **"buatkan html button keren"** — generate kode 10+ bahasa\n🔗 **"buka https://..."** — ambil konten dari link\n🌐 **Multi-bahasa** — 14 bahasa, deteksi otomatis!\n\nKetik `/help` buat panduan lengkap!');
+  },500);
+
+  // ===== 3D MOUSE TRACKING =====
+  const w=document.getElementById('chatW');
+  document.addEventListener('mousemove',function(e){
+    const r=w.getBoundingClientRect();
+    const dx=(e.clientX-r.left-r.width/2)/r.width;
+    const dy=(e.clientY-r.top-r.height/2)/r.height;
+    if(innerWidth>540) w.style.transform=`rotateX(${-dy*3}deg) rotateY(${dx*3}deg) translateZ(20px)`;
+  });
+  document.addEventListener('mouseleave',function(){
+    if(innerWidth>540) w.style.transform='rotateX(1deg) rotateY(-.5deg) translateZ(20px)';
+  });
 })();
 
-// Copy function global
+// ===== GLOBAL COPY FUNCTION =====
 window.cc=function(id){
   const pre=document.getElementById(id);if(!pre)return;
   const code=pre.textContent;

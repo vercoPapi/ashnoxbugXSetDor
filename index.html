@@ -2,61 +2,49 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Noxx AI | Cyber-Core</title>
     <style>
-        :root { 
-            --neon: #00f2ff; 
-            --neon-alt: #ff007f;
-            --bg-deep: #050505;
-        }
+        :root { --neon: #00f2ff; --neon-alt: #ff007f; }
         
         body { 
-            margin: 0; height: 100vh; display: flex; justify-content: center;
+            margin: 0; padding: 0; height: 100vh; width: 100vw;
             font-family: 'Segoe UI', sans-serif; overflow: hidden;
-            background: radial-gradient(circle at 70% 30%, #1a0a1a, #050505);
+            background: radial-gradient(circle at center, #1a0a1a, #000);
+            display: flex; justify-content: center;
         }
 
-        /* Container 3D Look */
+        /* Container Full Responsive */
         .container { 
-            width: 100%; max-width: 600px; height: 95vh; margin-top: 10px;
-            background: rgba(10, 10, 10, 0.7); backdrop-filter: blur(25px);
-            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 25px;
-            display: flex; flex-direction: column; position: relative;
-            box-shadow: 0 0 50px rgba(0,0,0,0.8), inset 0 0 20px rgba(0,242,255,0.1);
+            width: 100%; height: 100%; display: flex; flex-direction: column;
+            background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(15px);
         }
 
-        header { padding: 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        header { padding: 15px; text-align: center; border-bottom: 1px solid #333; }
         .logo-glow { 
-            width: 50px; height: 50px; border-radius: 15px; margin: 0 auto 10px;
+            width: 40px; height: 40px; border-radius: 10px; margin: 0 auto 5px;
             background: linear-gradient(135deg, var(--neon), var(--neon-alt));
             display: flex; align-items: center; justify-content: center;
-            font-weight: 900; color: #000; box-shadow: 0 0 20px var(--neon);
+            font-weight: 900; color: #000; box-shadow: 0 0 15px var(--neon);
         }
 
-        #chat-box { flex: 1; padding: 20px; overflow-y: auto; scrollbar-width: none; }
+        #chat-box { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; }
         
-        /* Bubble Chat Gahar */
-        .msg { padding: 15px 20px; border-radius: 18px; margin-bottom: 15px; max-width: 85%; animation: fadeIn 0.5s ease; position: relative; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
-        .user { align-self: flex-end; background: linear-gradient(90deg, #222, #000); border: 1px solid var(--neon-alt); color: white; border-bottom-right-radius: 5px; }
-        .ai { align-self: flex-start; background: rgba(255,255,255,0.05); border: 1px solid var(--neon); color: #fff; border-bottom-left-radius: 5px; }
+        .msg { padding: 12px 18px; border-radius: 15px; margin-bottom: 15px; max-width: 85%; animation: fadeIn 0.3s ease; }
+        .user { align-self: flex-end; background: linear-gradient(90deg, #1a1a1a, #000); border: 1px solid var(--neon-alt); color: white; }
+        .ai { align-self: flex-start; background: rgba(255,255,255,0.05); border: 1px solid var(--neon); color: #fff; }
 
-        /* Code Block Neon */
-        .code-block { background: #000; border: 1px solid #333; border-radius: 10px; margin: 10px 0; overflow: hidden; }
-        .code-top { background: #111; padding: 5px 15px; display: flex; justify-content: space-between; font-size: 10px; color: var(--neon); }
-        .code-pre { padding: 15px; color: #fff; font-family: monospace; overflow-x: auto; margin: 0; }
-        .btn-run { background: var(--neon); border: none; padding: 2px 8px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .code-block { width: 90%; background: #000; border: 1px solid #333; border-radius: 8px; margin: 10px 0; }
+        .code-top { background: #111; padding: 5px 10px; display: flex; justify-content: space-between; font-size: 10px; color: var(--neon); }
+        .code-pre { padding: 10px; color: #fff; font-family: monospace; overflow-x: auto; margin: 0; font-size: 12px; }
+        .btn-run { background: var(--neon); border: none; padding: 2px 8px; border-radius: 3px; cursor: pointer; font-size: 10px; font-weight: bold; }
 
-        /* Input Gahar */
-        .input-wrap { padding: 20px; }
-        .input-box { 
-            display: flex; padding: 5px; background: rgba(0,0,0,0.5); 
-            border: 1px solid #444; border-radius: 15px; backdrop-filter: blur(10px);
-        }
+        .input-wrap { padding: 15px; background: rgba(0,0,0,0.6); border-top: 1px solid #333; }
+        .input-box { display: flex; background: #111; border: 1px solid #444; border-radius: 10px; overflow: hidden; }
         input { flex: 1; background: transparent; border: none; padding: 15px; color: white; outline: none; }
-        button { background: var(--neon); border: none; border-radius: 12px; padding: 0 25px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        button:hover { box-shadow: 0 0 15px var(--neon); }
+        button { background: var(--neon); border: none; padding: 0 20px; font-weight: bold; cursor: pointer; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
@@ -64,15 +52,15 @@
 <div class="container">
     <header>
         <div class="logo-glow">NX</div>
-        <div style="color:white; letter-spacing: 2px; font-weight: bold;">NOXX CYBER-CORE</div>
+        <div style="color:white; font-size: 12px; letter-spacing: 1px;">NOXX CYBER-CORE</div>
     </header>
 
     <div id="chat-box"></div>
-    <div id="typing" style="color:var(--neon); padding-left:30px; font-size:12px; display:none;">Noxx is processing...</div>
+    <div id="typing" style="color:var(--neon); padding-left:20px; font-size:10px; display:none;">Noxx is thinking...</div>
 
     <div class="input-wrap">
         <div class="input-box">
-            <input type="text" id="user-input" placeholder="Enter command...">
+            <input type="text" id="user-input" placeholder="Type a command...">
             <button onclick="sendMessage()">SEND</button>
         </div>
     </div>
@@ -103,16 +91,13 @@
     function renderAI(text) {
         const parts = text.split(/```(?:[a-z]*\n)?([\s\S]*?)```/g);
         const box = document.getElementById('chat-box');
-        
         parts.forEach((p, i) => {
             if (i % 2 === 1) {
                 const div = document.createElement('div'); div.className = 'code-block';
                 div.innerHTML = `<div class="code-top"><span>CODE</span><button class="btn-run" onclick="run(this)">RUN</button></div><pre class="code-pre"></pre>`;
                 div.querySelector('.code-pre').textContent = p.trim();
                 box.appendChild(div);
-            } else if (p.trim()) {
-                addMsg(p.trim(), 'ai');
-            }
+            } else if (p.trim()) { addMsg(p.trim(), 'ai'); }
         });
         box.scrollTop = box.scrollHeight;
     }
